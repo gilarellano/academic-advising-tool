@@ -16,20 +16,17 @@ export class DegreeRequirement {
         this.totalCredits = totalCredits;
     }
 
+    calculateCredits(courses: Course[]): number {
+        return courses.reduce((acc, course) => acc + course.credits, 0);
+    }
+    
     checkCourseRequirement(course: Course): boolean {
         // Check if the course is in the list of required courses
         return this.requiredCourseIDs.includes(course.courseID.toString());
     }
 
-    calculateCredits(courses: Course[]): number {
-        // Sum up the credits for the provided courses
-        return courses.reduce((total, course) => total + course.credits, 0);
+    checkElectiveRequirement(course: Course): boolean {
+        return this.electiveCategories.includes(course.category);
     }
 
-    checkElectiveRequirement(courses: Course[]): boolean {
-        // Placeholder logic to check if elective requirements are met
-        // You will need to implement the actual logic based on your application's rules
-        // For now, let's assume it always returns true
-        return true;
-    }
 }

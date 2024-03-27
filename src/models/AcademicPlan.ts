@@ -34,7 +34,6 @@ export class AcademicPlan {
     }
 
     calculateTotalCredits(): number {
-        // Logic to calculate the total credits in the academic plan
-        return 0; // Placeholder for now
+        return this.courses.reduce((total, course) => total + course.credits, 0);
     }
 }
