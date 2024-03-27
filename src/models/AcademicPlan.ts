@@ -6,10 +6,17 @@ export class AcademicPlan {
     degreeRequirementsVersion: string;
     customizations: string;  // This could be a complex object or array depending on your needs
     progress: string;  // This could be an enum or a more complex type
+    isApproved: boolean = false;
     courses: Course[] = [];  // Initialize an empty array for courses
     degreeRequirement: DegreeRequirement;
 
-    constructor(planID: number, degreeRequirementsVersion: string, customizations: string, progress: string, degreeRequirement: DegreeRequirement) {
+    constructor(
+        planID: number = 0,
+        degreeRequirementsVersion: string = '-1.0',
+        customizations: string = '',
+        progress: string = 'Not Started',
+        degreeRequirement: DegreeRequirement = new DegreeRequirement()
+    ) {
         this.planID = planID;
         this.degreeRequirementsVersion = degreeRequirementsVersion;
         this.customizations = customizations;

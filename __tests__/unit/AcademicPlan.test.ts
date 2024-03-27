@@ -3,13 +3,20 @@ import { DegreeRequirement } from '../../src/models/DegreeRequirement';
 import { Course } from '../../src/models/Course';
 
 describe('AcademicPlan', () => {
+    let academicPlan: AcademicPlan;
+    let degreeRequirement: DegreeRequirement;
+
+    beforeEach(() => {
+        degreeRequirement = new DegreeRequirement(1, '2024C', ['101', '102'], ['Humanities'], 15);
+        academicPlan = new AcademicPlan(1, '2023A', 'No customizations', 'In progress', degreeRequirement);
+    });
+
     it('should be constructed with the given properties', () => {
         const planID = 1;
         const degreeRequirementsVersion = '2021';
         const customizations = 'Custom Plan';
         const progress = 'In Progress';
         const degreeRequirement = new DegreeRequirement(1, '2024C', ['101', '102'], ['Humanities'], 15);
-
 
         const academicPlan = new AcademicPlan(planID, degreeRequirementsVersion, customizations, progress, degreeRequirement);
 
@@ -23,50 +30,44 @@ describe('AcademicPlan', () => {
 
     describe('addCourse()', () => {
         it('should add a course to the courses array', () => {
-            const degreeRequirement = new DegreeRequirement(1, '2024C', ['101', '102'], ['Humanities'], 15);
-            const plan = new AcademicPlan(1, '2023A', 'No customizations', 'In progress', degreeRequirement);
             const course = new Course(101, 'Introduction to Programming', 3, 'Computer Science', 'Core');
 
-            expect(plan.courses.length).toBe(0); // Ensure the courses array is initially empty
+            expect(academicPlan.courses.length).toBe(0); // Ensure the courses array is initially empty
 
-            plan.addCourse(course);
+            academicPlan.addCourse(course);
 
-            expect(plan.courses.length).toBe(1); // The courses array should have one course after adding
-            expect(plan.courses[0]).toBe(course); // The added course should be the one we created
+            expect(academicPlan.courses.length).toBe(1); // The courses array should have one course after adding
+            expect(academicPlan.courses[0]).toBe(course); // The added course should be the one we created
         });
     });
 
     describe('removeCourse()', () => {
         it('should remove a course from the courses array', () => {
-            const degreeRequirement = new DegreeRequirement(1, '2024C', ['101', '102'], ['Humanities'], 15);
-            const plan = new AcademicPlan(1, '2023A', 'No customizations', 'In progress', degreeRequirement);
             const course1 = new Course(101, 'Introduction to Programming', 3, 'Computer Science', 'Core');
             const course2 = new Course(102, 'Data Structures', 3, 'Computer Science', 'Core');
 
-            plan.addCourse(course1);
-            plan.addCourse(course2);
-            expect(plan.courses.length).toBe(2); // Ensure the courses array has two courses before removal
+            academicPlan.addCourse(course1);
+            academicPlan.addCourse(course2);
+            expect(academicPlan.courses.length).toBe(2); // Ensure the courses array has two courses before removal
 
-            plan.removeCourse(course1);
+            academicPlan.removeCourse(course1);
 
-            expect(plan.courses.length).toBe(1); // The courses array should have one course after removal
-            expect(plan.courses[0]).toBe(course2); // The remaining course should be 'course2'
+            expect(academicPlan.courses.length).toBe(1); // The courses array should have one course after removal
+            expect(academicPlan.courses[0]).toBe(course2); // The remaining course should be 'course2'
         });
     });
 
     describe('calculateTotalCredits()', () => {
         it('should calculate the total credits of all courses in the plan', () => {
-            const degreeRequirement = new DegreeRequirement(1, '2024C', ['101', '102'], ['Humanities'], 15);
-            const plan = new AcademicPlan(1, '2023A', 'No customizations', 'In progress', degreeRequirement);
             const course1 = new Course(101, 'Introduction to Programming', 3, 'Computer Science', 'Core');
             const course2 = new Course(102, 'Data Structures', 4, 'Computer Science', 'Core');
             const course3 = new Course(103, 'Algorithms', 3, 'Computer Science', 'Core');
 
-            plan.addCourse(course1);
-            plan.addCourse(course2);
-            plan.addCourse(course3);
+            academicPlan.addCourse(course1);
+            academicPlan.addCourse(course2);
+            academicPlan.addCourse(course3);
 
-            const totalCredits = plan.calculateTotalCredits();
+            const totalCredits = academicPlan.calculateTotalCredits();
 
             expect(totalCredits).toBe(10); // The sum of credits for the three courses should be 10
         });
@@ -131,4 +132,5 @@ describe('AcademicPlan', () => {
             expect(plan.validatePlan()).toBe(true);  // Assuming duplicates don't invalidate the plan
         });
     });
+    
 });

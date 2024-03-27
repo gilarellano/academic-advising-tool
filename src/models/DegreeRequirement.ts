@@ -8,7 +8,13 @@ export class DegreeRequirement {
     electiveCategories: string[];
     totalCredits: number;
 
-    constructor(requirementID: number, version: string, requiredCourseIDs: string[], electiveCategories: string[], totalCredits: number) {
+    constructor(
+        requirementID: number = 0,
+        version: string = '-1.0',
+        requiredCourseIDs: string[] = [],
+        electiveCategories: string[] = [],
+        totalCredits: number = 0
+    ) {
         this.requirementID = requirementID;
         this.version = version;
         this.requiredCourseIDs = requiredCourseIDs;

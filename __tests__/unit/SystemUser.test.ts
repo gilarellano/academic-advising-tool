@@ -1,5 +1,3 @@
-// src/models/__tests__/SystemUser.test.ts
-
 import { SystemUser } from '../../src/models/SystemUser';
 
 describe('SystemUser', () => {
