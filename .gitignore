@@ -9,7 +9,6 @@ node_modules/
 
 # Build outputs
 dist/
-coverage/
 
 # IDE settings
 .idea/
