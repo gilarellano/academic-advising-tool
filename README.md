@@ -4,17 +4,9 @@
 **Name:** Gilberto Arellano
 **Student ID:** 1801074
 
-The Academic Advising Tool is a web-based application designed to streamline the academic planning process for students, advisors, and faculty. It automates the generation of degree plans, allows for flexible customization, and provides progress tracking to ensure students stay on track with their academic goals.
+The Academic Advising Tool is a web-based application designed to facilitate the academic planning process for students, advisors, and faculty. It automates the generation of degree plans, allows for flexible customization, and provides progress tracking to ensure students stay on track with their academic goals.
 
 ## Getting Started
-
-These instructions will get your copy of the project up and running on your local machine for development and testing purposes.
-
-### Prerequisites
-
-Before you begin, ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (version 12 or higher recommended)
-- [npm](https://www.npmjs.com/) (usually comes with Node.js)
 
 ### Installation
 
@@ -66,6 +58,7 @@ open coverage/lcov-report/index.html
 - `__tests__/`: Test suites for the project.
   - `unit/`: Unit tests for individual components.
   - `integration/`: Integration tests to test the interactions between components.
+- `coverage/`: Generated directory to provide test coverage report.
 - `node_modules/`: Project dependencies.
 - `jest.config.js`: Configuration file for Jest, set up to handle TypeScript tests directly.
 - `tsconfig.json`: Configuration file for TypeScript.
