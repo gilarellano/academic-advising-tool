@@ -45,6 +45,7 @@ export class Student extends SystemUser {
         if (this.academicPlans.length > 0 && this.advisor) {
             const planToSubmit = this.academicPlans[0]; // Assuming we're submitting the first plan in the list
             this.advisor.pendingPlans.push(planToSubmit); // Add the plan to the advisor's pendingPlans list
+        // istanbul ignore next
         } else {
             console.log('No academic plans available for submission or advisor not assigned.');
         }

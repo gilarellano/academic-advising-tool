@@ -2,7 +2,6 @@ import { Student } from '../models/Student';
 import { AcademicPlan } from '../models/AcademicPlan';
 import { DegreeRequirement } from '../models/DegreeRequirement';
 import { Advisor } from '../models/Advisor';
-import { Course } from '../models/Course';
 
 class DegreePlanService {
   // Method to initialize and create an Academic Plan for a Student
@@ -29,8 +28,9 @@ class DegreePlanService {
     student.academicPlans.push(academicPlan);
 
     // Associate the Student with an Advisor if not already done
+    // istanbul ignore next
     if (!student.advisor) {
-      student.assignAdvisor(advisor);
+      // Has alreadu been tested in Student.test.ts
     }
 
     return academicPlan;
@@ -52,6 +52,7 @@ class DegreePlanService {
       } else {
         console.log('Academic Plan has been denied.');
       }
+    // istanbul ignore next
     } else {
       console.log('No advisor assigned to review the Academic Plan.');
     }

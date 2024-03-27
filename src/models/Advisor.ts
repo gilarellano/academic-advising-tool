@@ -26,8 +26,7 @@ export class Advisor extends SystemUser {
     reviewPlan(plan: AcademicPlan): void {
         // First, check if the plan exists in pendingPlans
         const planIndex = this.pendingPlans.findIndex(p => p.planID === plan.planID);
-        if (planIndex === -1) {
-            console.log('No such plan found in pending plans.');
+        if (planIndex === -1) { // No plan found in list
             return;
         }
 
