@@ -33,7 +33,7 @@ Before you begin, ensure you have the following installed:
 
 ## Running the Tests
 
-The project uses Jest for unit and integration testing. Tests are organized under the `__tests__` directory, with separate subdirectories for unit and integration tests.
+The project uses Jest for unit and integration testing, leveraging TypeScript directly. Tests are organized under the `__tests__` directory, with separate subdirectories for unit and integration tests.
 
 ### Running All Tests
 
@@ -41,6 +41,8 @@ To run all tests and display a coverage summary, execute the following command:
 ```sh
 npm test
 ```
+
+This command directly runs the TypeScript tests without the need to compile them to JavaScript first.
 
 ### Running Specific Tests
 
@@ -64,16 +66,8 @@ open coverage/lcov-report/index.html
 - `__tests__/`: Test suites for the project.
   - `unit/`: Unit tests for individual components.
   - `integration/`: Integration tests to test the interactions between components.
-- `dist/`: Compiled JavaScript files (generated after building the project).
 - `node_modules/`: Project dependencies.
-- `jest.config.js`: Configuration file for Jest.
+- `jest.config.js`: Configuration file for Jest, set up to handle TypeScript tests directly.
 - `tsconfig.json`: Configuration file for TypeScript.
 - `package.json`: Defines scripts and dependencies of the project.
 
-## Building the Project
-
-To compile TypeScript to JavaScript and build the project, run:
-```sh
-npm run build
-```
-The compiled files will be placed in the `dist/` directory.
