@@ -4,11 +4,15 @@
 # Version control
 .git
 
+# Database config files
+ormconfig.json
+
 # Dependencies
 node_modules/
 
 # Build outputs
 dist/
+coverage/
 
 # IDE settings
 .idea/

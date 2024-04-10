@@ -1,3 +1,4 @@
+// Course.ts
 
 export class Course {
     courseID: number;
