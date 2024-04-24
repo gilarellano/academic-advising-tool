@@ -1,0 +1,15 @@
+import { Request, Response } from 'express';
+import { SystemUserService } from '../services/SystemUserService';
+
+export class SystemUserController {
+  constructor(private systemUserService: SystemUserService) {}
+
+  async getUser(req: Request, res: Response) {
+    const user = await this.systemUserService.findUserById(req.params.id);
+    if (user) {
+      res.send(user);
+    } else {
+      res.status(404).send('User not found');
+    }
+  }
+}
