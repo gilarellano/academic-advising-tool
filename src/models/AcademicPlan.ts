@@ -1,24 +1,42 @@
 // AcademicPlan.ts
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Student } from './Student';
+import { DegreeRequirement } from './DegreeRequirement';
+import { PlanCourses } from './PlanCourses';
 
+@Entity()
 export class AcademicPlan {
-    planID: number;
-    degreeRequirementID: number;
+    @PrimaryGeneratedColumn()
+    academicPlanID!: number;
+
+    @Column({ default: 0 })
     totalCredits: number;
-    isApproved: boolean = false;
+
+    @Column({ default: false })
+    isApproved: boolean;
+
+    // Relationships
+    @ManyToOne(() => Student, student => student.academicPlans)
+    @JoinColumn({ name: 'studentID' })
+    student: Student;
+
+    @ManyToOne(() => DegreeRequirement)
+    @JoinColumn({ name: 'degreeRequirementID' })
+    degreeRequirement: DegreeRequirement;
+
+    @OneToMany(() => PlanCourses, planCourses => planCourses.academicPlan)
+    planCourses!: PlanCourses[]
 
     constructor(
-        planID: number = 0,
-        degreeRequirementID: number = -1,
+        totalCredits: number = 0,
         isApproved = false,
+        student: Student,
+        degreeRequirement: DegreeRequirement,
     ) {
-        this.planID = planID;
-        this.degreeRequirementID = degreeRequirementID;
-        this.totalCredits = 0;
+        this.totalCredits = totalCredits;
         this.isApproved = isApproved;
-    }
-
-    updateTotalCredits(newTotal: number): void {
-        this.totalCredits = newTotal;
+        this.student = student;
+        this.degreeRequirement = degreeRequirement;
     }
 
 }

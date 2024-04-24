@@ -1,0 +1,110 @@
+import { AdvisorService } from '../../src/services/AdvisorService';
+import { StudentService } from '../../src/services/StudentService';
+import { AcademicPlanService } from '../../src/services/AcademicPlanService';
+import { AcademicPlan } from '../../src/models/AcademicPlan';
+import { Advisor } from '../../src/models/Advisor';
+import { Student } from '../../src/models/Student';
+
+describe('AdvisorService', () => {
+    let advisorService: AdvisorService;
+    let mockStudentService: jest.Mocked<StudentService>;
+    let mockAcademicPlanService: jest.Mocked<AcademicPlanService>;
+  
+    beforeEach(() => {
+        mockStudentService = new StudentService() as jest.Mocked<StudentService>;
+        mockAcademicPlanService = new AcademicPlanService() as jest.Mocked<AcademicPlanService>;
+        advisorService = new AdvisorService(mockStudentService, mockAcademicPlanService);
+        advisorService.advisors = []; // Reset the advisors array
+
+        // Mocking console.log and console.error
+        console.log = jest.fn();
+        console.error = jest.fn();
+    });
+  
+    describe('updatePlanApprovalStatus', () => {
+        it('should update approval status when plan is found', async () => {
+          const planID = 1;
+          const isApproved = true;
+          mockAcademicPlanService.getPlanById.mockReturnValue(new AcademicPlan(planID, 100, 200, true));
+    
+          await advisorService.updatePlanApprovalStatus(planID, isApproved);
+    
+          expect(mockAcademicPlanService.updateApprovalStatus).toHaveBeenCalledWith(planID, isApproved);
+          expect(console.log).toHaveBeenCalledWith(`Approval status updated to ${isApproved} for plan ID: ${planID}`);
+        });
+    
+        it('should log error when plan is not found', async () => {
+          const planID = 999;
+          const isApproved = false;
+          mockAcademicPlanService.getPlanById.mockReturnValue(undefined);
+    
+          await advisorService.updatePlanApprovalStatus(planID, isApproved);
+    
+          expect(mockAcademicPlanService.updateApprovalStatus).not.toHaveBeenCalled();
+          expect(console.error).toHaveBeenCalledWith('Plan not found');
+        });
+      });
+      
+  
+    describe('addStudent', () => {
+      it('should update student advisor', async () => {
+        const studentID = 1;
+        const advisorID = 10;
+  
+        await advisorService.addStudent(studentID, advisorID);
+  
+        expect(mockStudentService.updateAdvisor).toHaveBeenCalledWith(studentID, advisorID);
+      });
+    });
+  
+    describe('removeStudent', () => {
+      it('should remove advisor from student', async () => {
+        const studentID = 2;
+  
+        await advisorService.removeStudent(studentID);
+  
+        expect(mockStudentService.updateAdvisor).toHaveBeenCalledWith(studentID, -1);
+      });
+    });
+
+    describe('updateDepartment', () => {
+        it('should update advisor department if advisor found', async () => {
+            const advisorID = 3;
+            const newDepartment = 'Mathematics';
+            const initialDepartment = 'Physics';
+            const advisor = new Advisor(advisorID, initialDepartment);
+    
+            // Add the advisor to the service's array directly
+            advisorService.advisors.push(advisor);
+    
+            // Update the department
+            await advisorService.updateDepartment(advisorID, newDepartment);
+    
+            // Directly reference the updated advisor
+            const updatedAdvisor = advisorService.advisors.find(a => a.advisorID === advisorID);
+    
+            // Additional logging to debug the issue
+            console.log('Advisor after update:', updatedAdvisor);
+    
+            // Assert the department has been updated
+            expect(updatedAdvisor?.department).toEqual(newDepartment);
+        });
+    });
+    
+  
+    describe('getAdvisedStudents', () => {
+      it('should return advised students', async () => {
+        const advisorID = 4;
+        const students = [
+            new Student(1, 'Alice', 'john.doe@example.com', 'Student', 100, 200, advisorID, 15),
+            new Student(2, 'Bob', 'jane.doe@example.com', 'Student', 101, 201, advisorID, 20),
+        ];
+        mockStudentService.students = students;
+  
+        const advisedStudents = await advisorService.getAdvisedStudents(advisorID);
+  
+        expect(advisedStudents.length).toBe(2);
+        expect(advisedStudents).toEqual(expect.arrayContaining(students));
+      });
+    });
+  });

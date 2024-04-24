@@ -1,0 +1,88 @@
+import { AcademicPlanService } from '../../src/services/AcademicPlanService';
+import { CourseService } from '../../src/services/CourseService';
+import { PlanCoursesService } from '../../src/services/PlanCoursesService';
+import { Course } from '../../src/models/Course';
+
+describe('AcademicPlanService Tests', () => {
+  let academicPlanService: AcademicPlanService;
+
+  // Helper function to setup mock data
+  function setupMocks(courseData: { [key: number]: Course | undefined }) {
+    jest.spyOn(CourseService.prototype, 'fetchCourse').mockImplementation((id: number) => courseData[id]);
+    jest.spyOn(PlanCoursesService.prototype, 'getCoursesForPlan').mockReturnValue(Object.keys(courseData).map(Number));
+  }
+
+  beforeEach(() => {
+    academicPlanService = new AcademicPlanService();
+    const mockCourseData = {
+      1: { courseID: 1, credits: 3, name: "Math 101", department: "Mathematics", category: "Core" },
+      2: { courseID: 2, credits: 4, name: "English 101", department: "Literature", category: "Core" },
+      3: undefined  // Simulating a fetch failure
+    };
+    setupMocks(mockCourseData);
+  });
+
+  test('createPlan generates unique IDs and handles input correctly', () => {
+    const plan1 = academicPlanService.createPlan();
+    const plan2 = academicPlanService.createPlan();
+    expect(plan1.planID).not.toEqual(plan2.planID);
+    expect(academicPlanService.createPlan(2, 10)).toMatchObject({ degreeRequirementID: 10, studentID: 2 });
+  });
+
+  test('getPlanById retrieves correct plan', () => {
+    const plan = academicPlanService.createPlan();
+    expect(academicPlanService.getPlanById(plan.planID)).toBeDefined();
+    expect(academicPlanService.getPlanById(plan.planID)?.planID).toEqual(plan.planID);
+  });
+
+  describe('getPlanIDsByStudentID method', () => {
+    // Using descriptive test names and including specific conditions within each test case
+    const testCases = [
+      { studentID: 1, expectedIDs: [1, 2], description: "returns multiple plan IDs when multiple plans exist" },
+      { studentID: 999, expectedIDs: [], description: "returns an empty array when no plans exist" }
+    ];
+  
+    test.each(testCases)('%s', async ({ studentID, expectedIDs, description }) => {
+      // Set up - creating two plans for studentID 1 and none for studentID 999
+      if (expectedIDs.length > 0) {
+        academicPlanService.createPlan(studentID, 2);
+        academicPlanService.createPlan(studentID, 2);
+      }
+  
+      // Execution - retrieving plan IDs by studentID
+      const planIDs = academicPlanService.getPlanIDsByStudentID(studentID);
+  
+      // Assertion - checking if the retrieved IDs match the expected outcome
+      expect(planIDs).toEqual(expect.arrayContaining(expectedIDs));
+      // Additional check to ensure no extra IDs are returned
+      expect(planIDs.length).toBe(expectedIDs.length);
+    });
+  });
+
+  test('updateDegreeRequirementID and updateApprovalStatus handle existing and non-existent plans', () => {
+    const plan = academicPlanService.createPlan();
+    expect(academicPlanService.updateDegreeRequirementID(plan.planID, 123)).toMatchObject({ degreeRequirementID: 123 });
+    expect(academicPlanService.updateApprovalStatus(plan.planID, true)).toMatchObject({ isApproved: true });
+    expect(academicPlanService.updateDegreeRequirementID(999, 123)).toBeUndefined();
+    expect(academicPlanService.updateApprovalStatus(999, true)).toBeUndefined();
+  });
+
+  test('deletePlan handles existing and non-existent plans', () => {
+    const plan = academicPlanService.createPlan();
+    expect(academicPlanService.deletePlan(plan.planID)).toBe(true);
+    expect(academicPlanService.deletePlan(999)).toBe(false);
+  });
+
+  test('recalculateTotalCredits correctly calculates total credits, excluding undefined courses', async () => {
+    const plan = academicPlanService.createPlan();
+    await academicPlanService.recalculateTotalCredits(plan.planID);
+    expect(academicPlanService.getPlanById(plan.planID)?.totalCredits).toBe(7);
+  });
+
+  test('recalculateTotalCredits logs an error when plan is not found', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    await academicPlanService.recalculateTotalCredits(999); // Assuming 999 is a non-existent ID
+    expect(consoleSpy).toHaveBeenCalledWith('Plan not found');
+    consoleSpy.mockRestore();
+  });
+});

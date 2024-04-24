@@ -1,33 +1,42 @@
+// Student.ts
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { SystemUser } from './SystemUser';
+import { Advisor } from './Advisor';
+import { DegreeRequirement } from './DegreeRequirement';
+import { AcademicPlan } from './AcademicPlan';
 
+@Entity()
 export class Student extends SystemUser {
-    studentID: number;
-    requirementID: number;
-    advisorID: number;
+    @PrimaryGeneratedColumn()
+    studentID!: number;
+
+    @Column({ default: 0 })
     currentCredits: number;
 
-    static specificFields = ['RequirementID', 'CurrentCredits', 'AdvisorID'];
+    @ManyToOne(() => Advisor, { nullable: true })
+    @JoinColumn({ name: 'advisorID' })
+    advisor: Advisor | null;  // Continuing to reference Advisor entity
+
+    @ManyToOne(() => DegreeRequirement, degreeRequirement => degreeRequirement.students, { nullable: true })
+    @JoinColumn({ name: 'degreeRequirementID' })
+    degreeRequirement: DegreeRequirement | null;
+    
+    @OneToMany(() => AcademicPlan, academicPlan => academicPlan.student)
+    academicPlans!: AcademicPlan[];
+
+    readonly role: string = 'Student';
 
     constructor(
-        userID?: number,
-        name?: string,
-        email?: string,
-        role: string = 'Student',
-        studentID?: number,
-        requirementID?: number,
-        advisorID?: number,
-        currentCredits: number = 0
+        name: string,
+        email: string,
+        password: string,
+        currentCredits: number = 0,
+        advisor: Advisor | null = null,
+        degreeRequirement: DegreeRequirement | null = null
     ) {
-        super(userID ?? -1, name ?? 'Unknown', email ?? 'no-email@example.com', role);
-        this.studentID = studentID ?? -1;
-        this.requirementID = requirementID ?? -1;
-        this.advisorID = advisorID ?? -1;
+        super(name, email, password, 'Student');
         this.currentCredits = currentCredits;
+        this.advisor = advisor;
+        this.degreeRequirement = degreeRequirement;
     }
-
-    dispose() {
-        console.log(`Cleaning up Student resources for ${this.name}`);
-        // Add any specific cleanup logic here
-    }
-
 }

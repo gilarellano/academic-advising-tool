@@ -1,17 +1,34 @@
-
 // DegreeRequirement.ts
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Student } from "./Student";
+import { RequirementCourses } from "./RequirementCourses";
 
+@Entity()
 export class DegreeRequirement {
-    requirementID: number;
+    @PrimaryGeneratedColumn()
+    degreeRequirementID!: number;
+
+    @Column()
+    name: string;
+    
+    @Column()
     version: string;
+
+    @Column()
     totalCredits: number;
 
+    @OneToMany(() => Student, student => student.degreeRequirement)
+    students!: Student[];
+
+    @OneToMany(() => RequirementCourses, requirementCourses => requirementCourses.degreeRequirement)
+    requirementCourses!: RequirementCourses[];
+
     constructor(
-        requirementID: number = 0,
-        version: string = '-1.0',
-        totalCredits: number = 0
+        name: string,
+        version: string,
+        totalCredits: number
     ) {
-        this.requirementID = requirementID;
+        this.name = name;
         this.version = version;
         this.totalCredits = totalCredits;
     }

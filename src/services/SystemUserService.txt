@@ -32,7 +32,7 @@ export class SystemUserService {
         if (userIndex === -1) return false; // User not found
     
         // Call the dispose method before deletion
-        this.users[userIndex].dispose();
+        //this.users[userIndex].dispose(); <- THIS DOES NOT EXIST, WE NEED TO CREATE OUR OWN
     
         this.users.splice(userIndex, 1); // Remove the user from the array
         return true;

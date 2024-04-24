@@ -1,0 +1,70 @@
+import { AuthenticationTokenService } from '../../src/services/AuthenticationTokenService';
+// Importing jsonwebtoken to potentially mock its functions
+import jwt from 'jsonwebtoken';
+
+describe('AuthenticationTokenService', () => {
+    let authService: AuthenticationTokenService;
+
+    beforeEach(() => {
+        authService = new AuthenticationTokenService();
+    });
+
+    describe('generateToken', () => {
+        it('should generate a token for a given UserID', () => {
+            const token = authService.generateToken(1);
+
+            expect(token).toHaveProperty('Token');
+            expect(token.UserID).toBe(1);
+            // Additional assertions can be made about the structure of the token if necessary
+        });
+    });
+
+    describe('validateToken', () => {
+        it('should validate a correct token', () => {
+            const token = authService.generateToken(1).Token;
+            const isValid = authService.validateToken(token);
+            expect(isValid).toBeTruthy();
+        });
+
+        it('should invalidate an incorrect token', () => {
+            // Directly using an obviously invalid token
+            const token = 'clearly.invalid.token';
+            const isValid = authService.validateToken(token);
+            expect(isValid).toBeFalsy();
+        });
+
+        it('should recognize an expired token', () => {
+            // Mocking jwt.verify to simulate an expired token
+            const mockVerify = jest.spyOn(jwt, 'verify');
+            mockVerify.mockImplementation(() => {
+                throw new jwt.TokenExpiredError('jwt expired', new Date());
+            });
+
+            const token = authService.generateToken(1).Token;
+            const isValid = authService.validateToken(token);
+            expect(isValid).toBeFalsy();
+
+            // Restore the original implementation
+            mockVerify.mockRestore();
+        });
+    });
+
+    describe('invalidateToken', () => {
+        it('should indicate that a token has been invalidated', () => {
+            // This test will likely change with database integration
+            const consoleSpy = jest.spyOn(console, 'log');
+            authService.invalidateToken(1);
+            expect(consoleSpy).toHaveBeenCalledWith('Token with ID 1 would be invalidated here.');
+        });
+    });
+
+    describe('getTokenDetails', () => {
+        it('should indicate that token details functionality requires a database', () => {
+            // This test will also change with database integration
+            const consoleSpy = jest.spyOn(console, 'warn');
+            const tokenDetails = authService.getTokenDetails(1);
+            expect(consoleSpy).toHaveBeenCalledWith('getTokenDetails functionality requires database implementation');
+            expect(tokenDetails).toBeNull();
+        });
+    });
+});

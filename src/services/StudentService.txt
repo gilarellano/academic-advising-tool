@@ -1,0 +1,65 @@
+import { Student } from '../models/Student';
+import { AcademicPlanService } from './AcademicPlanService';  // Assuming AcademicPlanService is implemented
+
+export class StudentService {
+    public students: Student[] = []; // This would ideally be replaced by a database interaction
+    private academicPlanService: AcademicPlanService = new AcademicPlanService();
+
+    constructor() {}
+
+    updateAdvisor(studentID: number, newAdvisorID: number): void {
+        const student = this.students.find(s => s.studentID === studentID);
+        if (student) {
+            student.advisorID = newAdvisorID;
+            console.log(`Advisor updated for student ${studentID} to advisor ${newAdvisorID}`);
+        } else {
+            console.error('Student not found');
+        }
+    }
+
+    addAcademicPlan(studentID: number): void {
+        // Delegate to AcademicPlanService
+        const newPlan = this.academicPlanService.createPlan(studentID);
+        console.log(`Academic plan added for student ${studentID}: ${JSON.stringify(newPlan)}`);
+    }
+
+    removeAcademicPlan(planID: number): void {
+        const result = this.academicPlanService.deletePlan(planID);
+        if (result) {
+            console.log(`Academic plan ${planID} removed`);
+        } else {
+            console.error('Plan not found');
+        }
+    }
+    
+
+    updateDegreeRequirementID(studentID: number, newRequirementID: number): void {
+        const student = this.students.find(s => s.studentID === studentID);
+        if (student) {
+            student.requirementID = newRequirementID;
+            console.log(`Degree Requirement ID updated for student ${studentID} to ${newRequirementID}`);
+        } else {
+            console.error('Student not found');
+        }
+    }
+
+    updateCurrentCredits(studentID: number, newCredits: number): void {
+        const student = this.students.find(s => s.studentID === studentID);
+        if (student) {
+            student.currentCredits = newCredits;
+            //console.log(`Current credits updated for student ${studentID} to ${newCredits}`);
+        } else {
+            console.error('Student not found');
+        }
+    }
+
+    getAcademicPlans(studentID: number): number[] {
+        const planIDs = this.academicPlanService.getPlanIDsByStudentID(studentID);
+        if (planIDs.length > 0) {
+            console.log(`Academic plan IDs for student ${studentID}: ${planIDs.join(', ')}`);
+        } else {
+            console.log(`No academic plans found for student ${studentID}`);
+        }
+        return planIDs;
+    }
+}

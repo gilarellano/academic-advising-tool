@@ -1,0 +1,42 @@
+// Not using a config file yet
+// src/config/index.ts
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import { parsePort } from '../utils/config';
+
+// Load environment variables
+const basePath = path.join(__dirname, '../../'); // Adjust this path as necessary to point to your project root
+const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+dotenv.config({ path: path.join(basePath, envFile) });
+
+// Define type for Configuration to ensure type safety
+interface Config {
+    environment: string;
+    database: {
+        type: string;
+        host: string;
+        port: number;
+        username: string;
+        password: string;
+        databaseName: string;
+        synchronize: boolean;
+        logging: boolean;
+    };
+}
+
+// Parse and construct configuration object
+const config: Config = {
+    environment: process.env.NODE_ENV || 'development',
+    database: {
+        type: "postgres",
+        host: process.env.DB_HOST || 'localhost',
+        port: parsePort(process.env.DB_PORT) || 5432,
+        username: process.env.DB_USERNAME || 'postgres',
+        password: process.env.DB_PASSWORD || 'password',
+        databaseName: process.env.DB_DATABASE || 'mydatabase',
+        synchronize: process.env.DB_SYNCHRONIZE === 'true',
+        logging: process.env.DB_LOGGING === 'true'
+    }
+};
+
+export default config;

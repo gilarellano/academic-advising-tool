@@ -1,0 +1,117 @@
+import { StudentService } from '../../src/services/StudentService';
+import { Student } from '../../src/models/Student';
+import { AcademicPlanService } from '../../src/services/AcademicPlanService';
+import { AcademicPlan } from '../../src/models/AcademicPlan';
+
+// Setup mocks for AcademicPlanService
+jest.mock('../../src/services/AcademicPlanService', () => {
+    return {
+        AcademicPlanService: jest.fn().mockImplementation(() => ({
+            createPlan: jest.fn().mockReturnValue(new AcademicPlan()),
+            deletePlan: jest.fn().mockReturnValue(true),
+            getPlanIDsByStudentID: jest.fn().mockReturnValue([]),
+            getPlanById: jest.fn(),
+            updatePlan: jest.fn(),
+            recalculateTotalCredits: jest.fn(),
+        })),
+    };
+});
+
+describe('StudentService', () => {
+    let studentService: StudentService;
+    let students: Student[];
+    let mockAcademicPlanService: jest.Mocked<AcademicPlanService>;
+
+    beforeEach(() => {
+        studentService = new StudentService();
+        mockAcademicPlanService = new AcademicPlanService() as jest.Mocked<AcademicPlanService>;
+        studentService['academicPlanService'] = mockAcademicPlanService;
+        students = [
+            new Student(1, 'John Doe', 'john.doe@example.com', 'Student', 100, 200, 300, 15),
+            new Student(2, 'Jane Doe', 'jane.doe@example.com', 'Student', 101, 201, 301, 20)
+        ];
+        studentService['students'] = students;
+    });
+
+    describe('Positive cases', () => {
+        test('updateAdvisor updates the advisor ID if the student exists', () => {
+            studentService.updateAdvisor(100, 999);
+            expect(studentService['students'][0].advisorID).toEqual(999);
+        });
+
+        test('addAcademicPlan delegates to AcademicPlanService and logs the plan', () => {
+            const newPlan = new AcademicPlan(1, 100, 200);
+            mockAcademicPlanService.createPlan.mockReturnValue(newPlan);
+            const consoleSpy = jest.spyOn(console, 'log');
+            studentService.addAcademicPlan(100);
+            expect(mockAcademicPlanService.createPlan).toHaveBeenCalledWith(100);
+            expect(consoleSpy).toHaveBeenCalledWith(`Academic plan added for student 100: ${JSON.stringify(newPlan)}`);
+        });
+
+        test('removeAcademicPlan calls AcademicPlanService to remove a plan', () => {
+            mockAcademicPlanService.deletePlan.mockReturnValue(true);
+            studentService.removeAcademicPlan(1);
+            expect(mockAcademicPlanService.deletePlan).toHaveBeenCalledWith(1);
+        });
+
+        test('getAcademicPlans retrieves academic plan IDs for the student', () => {
+            mockAcademicPlanService.getPlanIDsByStudentID.mockReturnValue([1, 2, 3]);
+            const result = studentService.getAcademicPlans(100);
+            expect(result).toEqual([1, 2, 3]);
+        });
+
+        test('updateCurrentCredits correctly updates credits when the student exists', () => {
+            studentService.updateCurrentCredits(100, 30);
+            const student = studentService['students'].find(s => s.studentID === 100);
+            expect(student?.currentCredits).toEqual(30);
+        });
+
+        test('updateDegreeRequirementID correctly updates the requirement ID when the student exists', () => {
+            studentService.updateDegreeRequirementID(100, 400);
+            const student = studentService['students'].find(s => s.studentID === 100);
+            expect(student?.requirementID).toEqual(400);
+        });
+    });
+
+    describe('Negative cases', () => {
+        test('updateAdvisor logs an error if the student does not exist', () => {
+            const consoleSpy = jest.spyOn(console, 'error');
+            studentService.updateAdvisor(999, 999);
+            expect(consoleSpy).toHaveBeenCalledWith('Student not found');
+        });
+
+        test('addAcademicPlan handles no student found', () => {
+            const consoleSpy = jest.spyOn(console, 'error');
+            studentService.addAcademicPlan(999);
+            expect(consoleSpy).toHaveBeenCalledWith('Student not found');
+        });
+
+        test('removeAcademicPlan handles plan not found', () => {
+            mockAcademicPlanService.deletePlan.mockReturnValue(false);
+            const consoleSpy = jest.spyOn(console, 'error');
+            studentService.removeAcademicPlan(999);
+            expect(mockAcademicPlanService.deletePlan).toHaveBeenCalledWith(999);
+            expect(consoleSpy).toHaveBeenCalledWith('Plan not found');
+        });
+
+        test('getAcademicPlans handles no plans found', () => {
+            mockAcademicPlanService.getPlanIDsByStudentID.mockReturnValue([]);
+            const consoleSpy = jest.spyOn(console, 'log');
+            const result = studentService.getAcademicPlans(999);
+            expect(result).toEqual([]);
+            expect(consoleSpy).toHaveBeenCalledWith('No academic plans found for student 999');
+        });
+
+        test('updateCurrentCredits logs an error if the student does not exist', () => {
+            const consoleSpy = jest.spyOn(console, 'error');
+            studentService.updateCurrentCredits(999, 30);
+            expect(consoleSpy).toHaveBeenCalledWith('Student not found');
+        });
+
+        test('updateDegreeRequirementID logs an error if the student does not exist', () => {
+            const consoleSpy = jest.spyOn(console, 'error');
+            studentService.updateDegreeRequirementID(999, 400);
+            expect(consoleSpy).toHaveBeenCalledWith('Student not found');
+        });
+    });
+});

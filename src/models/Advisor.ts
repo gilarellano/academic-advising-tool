@@ -1,26 +1,27 @@
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { SystemUser } from './SystemUser';
+import { Student } from './Student';
 
+@Entity()
 export class Advisor extends SystemUser {
-    advisorID: number;
+    @PrimaryGeneratedColumn()
+    advisorID!: number;
+
+    @Column()
     department: string;
 
-    static specificFields = ['Department'];
+    @OneToMany(() => Student, student => student.advisor)
+    listOfStudents!: Student[];
+
+    readonly role: string = 'Advisor';
 
     constructor(
-        userID?: number,
-        name?: string,
-        email?: string,
-        role: string = 'Advisor', // Default role is 'Advisor'
-        advisorID?: number,
-        department: string = 'Undeclared' // Default department is 'Undeclared'
+        name: string,
+        email: string,
+        password: string,
+        department: string
     ) {
-        super(userID ?? -1, name ?? 'Unknown', email ?? 'no-email@example.com', role);
-        this.advisorID = advisorID ?? -1;
+        super(name, email, password, 'Advisor');
         this.department = department;
-    }
-
-    dispose() {
-        console.log(`Cleaning up Advisor resources for ${this.name}`);
-        // Add any specific cleanup logic here
     }
 }

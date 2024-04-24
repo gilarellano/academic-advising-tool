@@ -1,12 +1,22 @@
-// PlanCourses.ts
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm';
+import { AcademicPlan } from './AcademicPlan';
+import { Course } from './Course';
 
+@Entity()
 export class PlanCourses {
-    planID: number;
-    courseID: number;
+    @PrimaryGeneratedColumn()
+    planCoursesID!: number;
 
-    constructor(planID: number, courseID: number) {
-        this.planID = planID;
-        this.courseID = courseID;
+    @ManyToOne(() => AcademicPlan, academicPlan => academicPlan.planCourses)
+    @JoinColumn({ name: 'academicPlanID' })
+    academicPlan: AcademicPlan;
+
+    @ManyToOne(() => Course, course => course.planCourses)
+    @JoinColumn({ name: 'courseID' })
+    course: Course;
+
+    constructor(academicPlan: AcademicPlan, course: Course) {
+        this.academicPlan = academicPlan;
+        this.course = course;
     }
-
 }

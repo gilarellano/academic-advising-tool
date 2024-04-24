@@ -6,6 +6,9 @@
 
 # Database config files
 ormconfig.json
+.env.test
+.env.development
+.env.production
 
 # Dependencies
 node_modules/

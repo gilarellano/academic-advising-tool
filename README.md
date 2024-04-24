@@ -40,7 +40,7 @@ This command directly runs the TypeScript tests without the need to compile them
 
 To run a specific test file, use the Jest command followed by the path to the test file:
 ```sh
-npx jest __tests__/unit/YourTestFile.test.ts
+npx jest tests/unit/YourTestFile.test.ts
 ```
 
 ## Test Coverage

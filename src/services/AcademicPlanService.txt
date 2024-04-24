@@ -3,12 +3,14 @@ import { PlanCoursesService } from './PlanCoursesService';
 import { CourseService } from './CourseService';
 
 export class AcademicPlanService {
-    private plans: AcademicPlan[] = [];
+    public plans: AcademicPlan[] = [];
     private lastPlanID: number = 0;
     private planCoursesService: PlanCoursesService = new PlanCoursesService();
     private courseService: CourseService = new CourseService();
 
-    constructor() {}
+    constructor() {
+        this.plans = [];
+    }
 
     // Generates a unique planID for a new AcademicPlan
     private generatePlanID(): number {
@@ -17,9 +19,9 @@ export class AcademicPlanService {
     }
 
     // Creates a new AcademicPlan with an optional degreeRequirementID
-    public createPlan(degreeRequirementID?: number): AcademicPlan {
+    public createPlan(studentID?: number, degreeRequirementID?: number): AcademicPlan {
         const newPlanID = this.generatePlanID();
-        const newPlan = new AcademicPlan(newPlanID, degreeRequirementID ?? -1, false);
+        const newPlan = new AcademicPlan(newPlanID, studentID ?? -1, degreeRequirementID ?? -1, false);
         this.plans.push(newPlan);
         return newPlan;
     }
@@ -29,16 +31,27 @@ export class AcademicPlanService {
         return this.plans.find(plan => plan.planID === planID);
     }
 
-    // Updates an existing AcademicPlan's degreeRequirementID and/or isApproved status
-    public updatePlan(planID: number, degreeRequirementID?: number, isApproved?: boolean): AcademicPlan | undefined {
+    // Retrieves all AcademicPlan IDs for a given studentID
+    public getPlanIDsByStudentID(studentID: number): number[] {
+        return this.plans
+            .filter(plan => plan.studentID === studentID)
+            .map(plan => plan.planID);  // Extracting only the planID
+    }
+
+    // Updates the degreeRequirementID for an existing AcademicPlan
+    public updateDegreeRequirementID(planID: number, degreeRequirementID: number): AcademicPlan | undefined {
         const plan = this.getPlanById(planID);
         if (plan) {
-            if (degreeRequirementID !== undefined) {
-                plan.degreeRequirementID = degreeRequirementID;
-            }
-            if (isApproved !== undefined) {
-                plan.isApproved = isApproved;
-            }
+            plan.degreeRequirementID = degreeRequirementID;
+        }
+        return plan;
+    }
+
+    // Updates the approval status for an existing AcademicPlan
+    public updateApprovalStatus(planID: number, isApproved: boolean): AcademicPlan | undefined {
+        const plan = this.getPlanById(planID);
+        if (plan) {
+            plan.isApproved = isApproved;
         }
         return plan;
     }

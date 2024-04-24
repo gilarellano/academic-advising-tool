@@ -1,0 +1,58 @@
+import { StudentService } from './StudentService';
+import { AcademicPlanService } from './AcademicPlanService';
+import { Advisor } from '../models/Advisor';
+import { Student } from '../models/Student';
+
+export class AdvisorService {
+    private studentService: StudentService;
+    private academicPlanService: AcademicPlanService;
+    public advisors: Advisor[] = [];  // This array would ideally be replaced by a database interaction
+
+    constructor(studentService: StudentService, academicPlanService: AcademicPlanService) {
+        this.studentService = studentService;
+        this.academicPlanService = academicPlanService;
+    }
+
+    async updatePlanApprovalStatus(planID: number, isApproved: boolean): Promise<void> {
+        const plan = this.academicPlanService.getPlanById(planID);
+        if (plan) {
+            await this.academicPlanService.updateApprovalStatus(planID, isApproved);
+            console.log(`Approval status updated to ${isApproved} for plan ID: ${planID}`);
+        } else {
+            console.error('Plan not found');
+        }
+    }
+
+    async addStudent(studentID: number, advisorID: number): Promise<void> {
+        this.studentService.updateAdvisor(studentID, advisorID);
+        console.log(`Student ${studentID} added to advisor ${advisorID}`);
+    }
+    
+    async removeStudent(studentID: number): Promise<void> {
+        this.studentService.updateAdvisor(studentID, -1);
+        console.log(`Advisor removed for student ${studentID}`);
+    }
+
+    async updateDepartment(advisorID: number, newDepartment: string): Promise<void> {
+        // Assume advisors are stored similarly to students
+        const advisor = this.advisors.find(a => a.advisorID === advisorID);
+        console.log('Before update:', advisor);
+    
+        if (advisor) {
+            advisor.department = newDepartment;
+            console.log(`Department updated for advisor ${advisorID} to ${newDepartment}`);
+        } else {
+            console.error('Advisor not found');
+        }
+    
+        console.log('After update:', advisor);
+    }
+    
+    
+    
+    async getAdvisedStudents(advisorID: number): Promise<Student[]> {
+        const advisedStudents = this.studentService.students.filter(student => student.advisorID === advisorID);
+        console.log(`Students advised by advisor ${advisorID}: ${advisedStudents.map(s => s.studentID).join(', ')}`);
+        return advisedStudents;
+    }
+}
