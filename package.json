@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "build": "tsc",
     "start": "node dist/main.js",
     "dev": "ts-node src/main.ts",
@@ -28,7 +27,7 @@
     "formidable": "^3.5.1",
     "jest": "^29.7.0",
     "npm-force-resolutions": "^0.0.10",
-    "supertest": "^6.3.4",
+    "supertest": "^7.0.0",
     "ts-jest": "^29.1.2",
     "typescript": "^5.4.5"
   },
@@ -37,10 +36,9 @@
     "dotenv": "^16.4.5",
     "dotenv-expand": "^11.0.6",
     "pg": "^8.11.5",
+    "sql.js": "^1.10.3",
     "superagent": "^9.0.1",
+    "ts-mockito": "^2.6.1",
     "typeorm": "^0.3.20"
-  },
-  "resolutions": {
-    "formidable": "^3.2.4"
   }
 }
