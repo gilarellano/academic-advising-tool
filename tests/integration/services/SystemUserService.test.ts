@@ -1,15 +1,28 @@
 import { DataSource } from 'typeorm';
-import { SystemUser } from '../../../src/models';  // Assuming SystemUser is exported from models
+import { SystemUser } from '../../../src/models';  
 import { SystemUserService } from '../../../src/services/SystemUserService';
 import { SystemUserRepository } from '../../../src/repositories/SystemUserRepository';
 import { parsePort } from '../../../src/utils/config';
-import * as securityUtils from '../../../src/utils/security';
-import { comparePassword } from '../../../src/utils/security';
-import * as entities from '../../../src/models';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
+import * as security from '../../../src/utils/security';
 
-// Global scope variable for the queryRunner mock
+// Setup global mocks
+jest.mock('../../../src/repositories/SystemUserRepository');
+jest.mock('../../../src/utils/security', () => ({
+  ...jest.requireActual('../../../src/utils/security'),
+  comparePassword: jest.fn()
+}));
+jest.mock('typeorm', () => {
+  const original = jest.requireActual('typeorm');
+  return {
+    __esModule: true,
+    ...original,
+    DataSource: jest.fn(() => ({
+      createQueryRunner: () => mockQueryRunner
+    }))
+  };
+});
+
+// Global variables for mocks
 const mockQueryRunner = {
   connect: jest.fn(),
   startTransaction: jest.fn(),
@@ -18,31 +31,6 @@ const mockQueryRunner = {
   release: jest.fn()
 };
 
-
-// Mock the repository and query runner
-jest.mock('../../../src/repositories/SystemUserRepository');
-jest.mock('../../../src/utils/security', () => ({
-  comparePassword: jest.fn()
-}));
-jest.mock('typeorm', () => {
-  const originalModule = jest.requireActual('typeorm');
-
-  return {
-    __esModule: true,
-    ...originalModule,
-    DataSource: jest.fn().mockImplementation(() => ({
-      createQueryRunner: () => mockQueryRunner
-      //({
-        //connect: jest.fn(),
-        //startTransaction: jest.fn(),
-        //commitTransaction: jest.fn(),
-        //rollbackTransaction: jest.fn(),
-        //release: jest.fn()
-      //})
-    }))
-  };
-});
-
 describe('SystemUserService', () => {
   let userService: SystemUserService;
   let dataSource: DataSource;
@@ -50,21 +38,21 @@ describe('SystemUserService', () => {
 
   beforeEach(() => {
     dataSource = new DataSource({
-      type: "postgres",
-      host: process.env.DB_HOST,
-      port: parsePort(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      synchronize: true,
-      logging: false
-    });  // This will now use the mocked DataSource
+      type: "postgres"
+      //host: process.env.DB_HOST,
+      //port: parsePort(process.env.DB_PORT),
+      //username: process.env.DB_USERNAME,
+      //password: process.env.DB_PASSWORD,
+      //database: process.env.DB_DATABASE,
+      //synchronize: true,
+      //logging: false
+    });
     mockUserRepository = new SystemUserRepository(dataSource) as any;
     userService = new SystemUserService(dataSource);
-    userService.userRepository = mockUserRepository;  // Inject the mock
+    userService.userRepository = mockUserRepository;
   });
 
-  describe('createUser', () => {
+  describe('User Creation and Updates', () => {
     const mockUser: SystemUser = {
       userID: 1,
       name: 'John Doe',
@@ -73,81 +61,63 @@ describe('SystemUserService', () => {
       password: 'hashedpassword'
     };
 
-    it('should successfully create a user and commit the transaction', async () => {
+    it('creates a user successfully and commits the transaction', async () => {
       mockUserRepository.createSystemUser.mockResolvedValue(mockUser);
-
       const user = await userService.createUser('John Doe', 'john@example.com', 'user', 'password');
-
       expect(mockUserRepository.createSystemUser).toHaveBeenCalledWith('John Doe', 'john@example.com', 'user', 'password', expect.anything());
       expect(user).toEqual(mockUser);
     });
 
-    it('should handle errors by rolling back the transaction', async () => {
+    it('handles errors by rolling back the transaction on user creation', async () => {
       const error = new Error('Database failure');
       mockUserRepository.createSystemUser.mockRejectedValue(error);
-
       await expect(userService.createUser('John Doe', 'john@example.com', 'user', 'password'))
         .rejects.toThrow('Database failure');
-
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
     });
-  });
 
-  describe('updateUserName', () => {
-    it('should successfully update user name', async () => {
-      mockUserRepository.updateUserName.mockResolvedValue(undefined); // Assuming it returns void
+    describe('Updates', () => {
+      it('updates user name successfully', async () => {
+        await userService.updateUserName(1, 'New Name');
+        expect(mockUserRepository.updateUserName).toHaveBeenCalledWith(1, 'New Name');
+      });
 
-      await userService.updateUserName(1, 'New Name');
-      expect(mockUserRepository.updateUserName).toHaveBeenCalledWith(1, 'New Name');
+      it('updates user email and commits transaction', async () => {
+        await userService.updateUserEmail(1, 'new@example.com');
+        expect(mockUserRepository.updateUserEmail).toHaveBeenCalledWith(1, 'new@example.com', expect.anything());
+        expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+      });
+
+      it('updates user role successfully', async () => {
+        await userService.updateUserRole(1, 'admin');
+        expect(mockUserRepository.updateUserRole).toHaveBeenCalledWith(1, 'admin');
+      });
+
+      it('updates user password and commits transaction', async () => {
+        await userService.updateUserPassword(1, 'newPassword');
+        expect(mockUserRepository.updateUserPassword).toHaveBeenCalledWith(1, 'newPassword', expect.anything());
+        expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+      });
+
+      it('should handle errors by rolling back the transaction when updating password', async () => {
+        const error = new Error('Update failed');
+        mockUserRepository.updateUserPassword.mockRejectedValue(error);
+  
+        await expect(userService.updateUserPassword(1, 'newPassword')).rejects.toThrow('Update failed');
+        expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
+      });
+
+      it('should handle errors by rolling back the transaction when updating email', async () => {
+        const error = new Error('Update failed');
+        mockUserRepository.updateUserEmail.mockRejectedValue(error);
+  
+        await expect(userService.updateUserEmail(1, 'new@example.com')).rejects.toThrow('Update failed');
+        expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
+      });
     });
   });
 
-  describe('updateUserEmail', () => {
-    it('should successfully update user email and commit transaction', async () => {
-      mockUserRepository.updateUserEmail.mockResolvedValue(undefined);
-
-      await userService.updateUserEmail(1, 'new@example.com');
-      expect(mockUserRepository.updateUserEmail).toHaveBeenCalledWith(1, 'new@example.com', expect.anything());
-      expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-    });
-
-    it('should handle errors by rolling back the transaction when updating email', async () => {
-      const error = new Error('Update failed');
-      mockUserRepository.updateUserEmail.mockRejectedValue(error);
-
-      await expect(userService.updateUserEmail(1, 'new@example.com')).rejects.toThrow('Update failed');
-      expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
-    });
-  });
-
-  describe('updateUserRole', () => {
-    it('should successfully update user role', async () => {
-      mockUserRepository.updateUserRole.mockResolvedValue(undefined);
-
-      await userService.updateUserRole(1, 'admin');
-      expect(mockUserRepository.updateUserRole).toHaveBeenCalledWith(1, 'admin');
-    });
-  });
-
-  describe('updateUserPassword', () => {
-    it('should successfully update user password and commit transaction', async () => {
-      mockUserRepository.updateUserPassword.mockResolvedValue(undefined);
-
-      await userService.updateUserPassword(1, 'newPassword');
-      expect(mockUserRepository.updateUserPassword).toHaveBeenCalledWith(1, 'newPassword', expect.anything());
-      expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
-    });
-
-    it('should handle errors by rolling back the transaction when updating password', async () => {
-      const error = new Error('Update failed');
-      mockUserRepository.updateUserPassword.mockRejectedValue(error);
-
-      await expect(userService.updateUserPassword(1, 'newPassword')).rejects.toThrow('Update failed');
-      expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
-    });
-  });
-
-  describe('loginUser', () => {
+  describe('User Authentication', () => {
     const mockUser: SystemUser = {
       userID: 1,
       name: 'John Doe',
@@ -156,28 +126,22 @@ describe('SystemUserService', () => {
       password: 'hashedpassword'
     };
 
-    it('should throw an error if the email does not exist', async () => {
+    it('throws an error if the email does not exist', async () => {
       mockUserRepository.findUserByEmail.mockResolvedValue(null);
-
-      await expect(userService.loginUser('user@example.com', 'password'))
-        .rejects.toThrow("Invalid credentials");
+      await expect(userService.loginUser('nonexistent@example.com', 'password')).rejects.toThrow("Invalid credentials");
     });
 
-    it('should throw an error if the password is incorrect', async () => {
+    it('throws an error if the password does not match', async () => {
       mockUserRepository.findUserByEmail.mockResolvedValue(mockUser);
-      securityUtils.comparePassword.mockResolvedValue(false);
-
-      await expect(userService.loginUser('user@example.com', 'wrongPassword'))
-        .rejects.toThrow("Invalid credentials");
+      (security.comparePassword as jest.Mock).mockResolvedValue(false);
+      await expect(userService.loginUser('john@example.com', 'wrongpassword')).rejects.toThrow("Invalid credentials");
     });
 
-    it('should return true if the email exists and the password matches', async () => {
+    it('returns true when email exists and password matches', async () => {
       mockUserRepository.findUserByEmail.mockResolvedValue(mockUser);
-      securityUtils.comparePassword.mockResolvedValue(true);
-
-      const result = await userService.loginUser('user@example.com', 'correctPassword');
-      expect(result).toBe(true);
+      (security.comparePassword as jest.Mock).mockResolvedValue(true);
+      const loginSuccess = await userService.loginUser('john@example.com', 'correctpassword');
+      expect(loginSuccess).toBe(true);
     });
   });
-
 });
