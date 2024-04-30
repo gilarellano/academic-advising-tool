@@ -38,3 +38,6 @@ yarn.lock
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Code Coverage Report, SonarQube
+sonar-project.js
