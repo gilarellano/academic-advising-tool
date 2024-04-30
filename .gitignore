@@ -40,4 +40,5 @@ yarn.lock
 *.tsbuildinfo
 
 # Code Coverage Report, SonarQube
+.scannerwork/
 sonar-project.js
