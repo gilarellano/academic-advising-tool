@@ -7,7 +7,7 @@ import { parsePort } from '../utils/config';
 
 // Dynamically determine which .env file to use based on NODE_ENV
 const basePath = path.join(__dirname, '../../'); // Adjust this path as necessary to point to your project root
-const envPath = `${basePath}.env.${process.env.NODE_ENV || 'development'}`;
+const envPath = `${basePath}.env.${process.env.NODE_ENV ?? 'development'}`;
 dotenv.config({ path: envPath });
 
 // For Debugging

@@ -2,7 +2,6 @@ import { DataSource } from 'typeorm';
 import { SystemUser } from '../../../src/models';  
 import { SystemUserService } from '../../../src/services/SystemUserService';
 import { SystemUserRepository } from '../../../src/repositories/SystemUserRepository';
-import { parsePort } from '../../../src/utils/config';
 import * as security from '../../../src/utils/security';
 
 // Setup global mocks

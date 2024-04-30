@@ -7,5 +7,13 @@ module.exports = {
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts']
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  reporters: [
+    "default",
+    ["jest-junit", {
+      outputDirectory: "coverage",
+      outputName: "test-report.xml",
+    }]
+  ]
 };
+

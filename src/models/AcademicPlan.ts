@@ -28,10 +28,10 @@ export class AcademicPlan {
     planCourses!: PlanCourses[]
 
     constructor(
-        totalCredits: number = 0,
-        isApproved = false,
         student: Student,
         degreeRequirement: DegreeRequirement,
+        totalCredits: number = 0,
+        isApproved = false,
     ) {
         this.totalCredits = totalCredits;
         this.isApproved = isApproved;

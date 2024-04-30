@@ -1,10 +1,9 @@
-import { DataSource, QueryRunner } from 'typeorm';
+// SystemUserService.ts
+import { DataSource} from 'typeorm';
 import { SystemUser } from '../models';
 import { SystemUserRepository } from '../repositories/SystemUserRepository';
 import { comparePassword } from '../utils/security';
-import * as entities from '../models';
-import * as dotenv from 'dotenv';
-import * as path from 'path';
+
 
 export class SystemUserService {
     userRepository: SystemUserRepository;
