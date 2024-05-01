@@ -1,46 +1,15 @@
-// SystemUserController.ts
 import { Request, Response } from 'express';
 import { SystemUserController } from '../../../src/api/controllers/SystemUserController';
 import { SystemUserService } from '../../../src/services/SystemUserService';
 import { DataSource } from 'typeorm';
-import { SystemUser } from '../../../src/models';
 
-// Mock SystemUserService including createUser directly on the service
-jest.mock('../../../src/services/SystemUserService', () => {
-    const mockUserRepository = {
-      findUserById: jest.fn(),
-      updateUserName: jest.fn(),
-      deleteSystemUser: jest.fn(),
-      // createUser is NOT here because it's on the service directly
-    };
-    return {
-      SystemUserService: jest.fn().mockImplementation(() => {
-        return {
-            userRepository: mockUserRepository,
-            createUser: jest.fn(),  // createUser is mocked directly on the service
-            loginUser: jest.fn()
-        };
-      })
-    };
-});
+// Mock SystemUserService methods (ex: mockService.createUser.mockResolvedValue(mockUser))
+jest.mock('../../../src/services/SystemUserService');
 
-
-jest.mock('typeorm', () => {
-  const original = jest.requireActual('typeorm');
-  return {
-    __esModule: true,
-    ...original,
-    DataSource: jest.fn().mockImplementation(() => ({
-      initialize: jest.fn()
-    }))
-  };
-});
-
-// Mock Request and Response objects
-const mockRequest = (body: any = {}, params: any = {}) => ({
+const mockRequest = (body: any = {}, params: any = {}, query: any = {}) => ({
   body,
   params,
-  get: jest.fn()
+  query
 }) as unknown as Request;
 
 const mockResponse = () => {
@@ -53,14 +22,12 @@ const mockResponse = () => {
 describe('SystemUserController', () => {
   let controller: SystemUserController;
   let mockService: jest.Mocked<SystemUserService>;
-  //let mockService = SystemUserService;
   
   beforeEach(() => {
-    const dataSource = new DataSource({type: 'postgres'}); // This is just a placeholder
-    //mockService = new SystemUserService(dataSource);
+    const dataSource = new DataSource( {type: 'postgres' } ); // Just a placeholder
     mockService = new SystemUserService(dataSource) as jest.Mocked<SystemUserService>;
-    controller = new SystemUserController(); // Assuming controller uses a singleton pattern or DI is handled elsewhere
-    controller.systemUserService = mockService;
+    controller = new SystemUserController();
+    controller.systemUserService = mockService; // Injecting the mocked service
   });
 
   describe('createUser', () => {
@@ -72,7 +39,7 @@ describe('SystemUserController', () => {
         password: 'password'
       });
       const res = mockResponse();
-      const mockUser: SystemUser = {
+      const mockUser = {
         userID: 1,
         name: 'John Doe',
         email: 'john@example.com',
@@ -122,14 +89,13 @@ describe('SystemUserController', () => {
       expect(res.json).toHaveBeenCalledWith({ message: error.message });
     });
   });
-  
   describe('getUserById', () => {
     it('should return user if found', async () => {
       const req = { params: { userId: '1' } } as any;
       const res = mockResponse();
-      const expectedUser = { userID: 1, name: 'Alice', email: 'alice@example.com' };
+      const expectedUser = { userID: 1, name: 'Alice', email: 'alice@example.com', role: 'admin', password: 'pass123' };
   
-      (mockService.userRepository.findUserById as jest.Mock).mockResolvedValue(expectedUser);
+      mockService.findUserByID.mockResolvedValue(expectedUser);
   
       await controller.getUserById(req, res);
   
@@ -137,11 +103,12 @@ describe('SystemUserController', () => {
       expect(res.json).toHaveBeenCalledWith(expectedUser);
     });
   
+  
     it('should return 404 if user not found', async () => {
       const req = { params: { userId: '1' } } as any;
       const res = mockResponse();
   
-      (mockService.userRepository.findUserById as jest.Mock).mockResolvedValue(null);
+      mockService.findUserByID.mockResolvedValue(null);
   
       await controller.getUserById(req, res);
   
@@ -155,7 +122,7 @@ describe('SystemUserController', () => {
         const error = new Error('Database failure');
     
         // Simulate a rejection caused by a database error
-        (mockService.userRepository.findUserById as jest.Mock).mockRejectedValue(error);
+        mockService.findUserByID.mockRejectedValue(error);
     
         await controller.getUserById(req, res);
     
@@ -164,18 +131,15 @@ describe('SystemUserController', () => {
       });
 
   });
-
+  
   describe('updateUserName', () => {
     it('should update user name successfully', async () => {
       const req = mockRequest({ newName: 'New Name' }, { userId: '1' });
       const res = mockResponse();
   
-      //(mockService.userRepository.updateUserName as jest.Mock).mockResolvedValue();
-      //mockService.userRepository.up
-  
       await controller.updateUserName(req, res);
   
-      expect(mockService.userRepository.updateUserName).toHaveBeenCalledWith(1, 'New Name');
+      expect(mockService.updateUserName).toHaveBeenCalledWith(1, 'New Name');
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ message: "User name updated successfully" });
     });
@@ -195,11 +159,11 @@ describe('SystemUserController', () => {
       const res = mockResponse();
       const error = new Error('Internal Server Error');
   
-      (mockService.userRepository.updateUserName as jest.Mock).mockRejectedValue(error);
+      mockService.updateUserName.mockRejectedValue(error);
   
       await controller.updateUserName(req, res);
   
-      expect(mockService.userRepository.updateUserName).toHaveBeenCalledWith(1, 'New Name');
+      expect(mockService.updateUserName).toHaveBeenCalledWith(1, 'New Name');
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ message: error.message });
     });
@@ -209,12 +173,11 @@ describe('SystemUserController', () => {
     it('should delete a user successfully', async () => {
       const req = mockRequest({}, { userId: '1' });
       const res = mockResponse();
-  
-      //mockService.userRepository.deleteSystemUser.mockResolvedValue();
-  
+    
+      mockService.deleteSystemUser.mockResolvedValue();
       await controller.deleteUser(req, res);
   
-      expect(mockService.userRepository.deleteSystemUser).toHaveBeenCalledWith(1);
+      expect(mockService.deleteSystemUser).toHaveBeenCalledWith(1);
       expect(res.status).toHaveBeenCalledWith(204);
     });
   
@@ -223,13 +186,11 @@ describe('SystemUserController', () => {
       const res = mockResponse();
       const error = new Error('Deletion Failed');
   
-      //mockService.userRepository.deleteSystemUser.mockRejectedValue(error);
-      (mockService.userRepository.deleteSystemUser as jest.Mock).mockRejectedValue(error);
-
+      mockService.deleteSystemUser.mockRejectedValue(error);
   
       await controller.deleteUser(req, res);
   
-      expect(mockService.userRepository.deleteSystemUser).toHaveBeenCalledWith(1);
+      expect(mockService.deleteSystemUser).toHaveBeenCalledWith(1);
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ message: error.message });
     });
@@ -241,8 +202,6 @@ describe('SystemUserController', () => {
       const res = mockResponse();
   
       mockService.loginUser.mockResolvedValue(true);
-      //(mockService.userRepository.findUserById as jest.Mock).mockResolvedValue(null);
-
   
       await controller.loginUser(req, res);
   
@@ -286,5 +245,67 @@ describe('SystemUserController', () => {
     });
 
   });
+
+  describe('getAllUsers', () => {
+    it('should return users with default pagination if no parameters are provided', async () => {
+      const req = mockRequest({}, {}, { query: {} }); // Ensure query is empty to use defaults
+      const res = mockResponse();
+      const mockUsers = [
+        { userID: 1, name: 'Alice', email: 'alice@example.com', role: 'admin', password: 'securepass' },
+        { userID: 2, name: 'Bob', email: 'bob@example.com', role: 'user', password: 'securepass' }
+      ];
   
+      mockService.retrieveAllUsers.mockResolvedValue(mockUsers);
+  
+      await controller.getAllUsers(req, res);
+  
+      expect(mockService.retrieveAllUsers).toHaveBeenCalledWith(1, 10);  // Default values
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ data: mockUsers, page: 1, limit: 10 });
+    });
+  
+    it('should return users with specified pagination', async () => {
+      const req = mockRequest({}, {}, { page: '2', limit: '5' });
+      const res = mockResponse();
+      const mockUsers = [
+          { userID: 3, name: 'Charlie', email: 'charlie@example.com', role: 'user', password: 'securepass' }
+      ];
+  
+      mockService.retrieveAllUsers.mockResolvedValue(mockUsers);
+  
+      await controller.getAllUsers(req, res);
+  
+      expect(mockService.retrieveAllUsers).toHaveBeenCalledWith(2, 5);  // Checks the specific values
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ data: mockUsers, page: 2, limit: 5 });
+    });
+  
+  
+    it('should handle no users found with specified pagination', async () => {
+      const req = mockRequest({}, {}, { page: '3', limit: '5' });
+      const res = mockResponse();
+  
+      mockService.retrieveAllUsers.mockResolvedValue([]);
+  
+      await controller.getAllUsers(req, res);
+  
+      expect(mockService.retrieveAllUsers).toHaveBeenCalledWith(3, 5);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ data: [], page: 3, limit: 5 });
+    });
+  
+    it('should handle internal server errors gracefully', async () => {
+      const req = mockRequest();
+      const res = mockResponse();
+      const error = new Error('Internal server error');
+  
+      mockService.retrieveAllUsers.mockRejectedValue(error);
+  
+      await controller.getAllUsers(req, res);
+  
+      expect(mockService.retrieveAllUsers).toHaveBeenCalledWith(1, 10);  // Default values
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: error.message });
+    });
+  });
 });

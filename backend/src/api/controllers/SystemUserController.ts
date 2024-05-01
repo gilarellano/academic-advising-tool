@@ -28,8 +28,8 @@ export class SystemUserController {
     // Fetch a user by ID
     public getUserById = async (req: Request, res: Response): Promise<Response> => {
         try {
-            const userId = parseInt(req.params.userId);
-            const user = await this.systemUserService.userRepository.findUserById(userId);
+            const userID = parseInt(req.params.userId);
+            const user = await this.systemUserService.findUserByID(userID);
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
@@ -40,7 +40,6 @@ export class SystemUserController {
         }
     };
 
-    // Update a user's name
     public updateUserName = async (req: Request, res: Response): Promise<Response> => {
         try {
             const userId = parseInt(req.params.userId);
@@ -48,7 +47,7 @@ export class SystemUserController {
             if (!newName) {
                 return res.status(400).json({ message: "New name must be provided" });
             }
-            await this.systemUserService.userRepository.updateUserName(userId, newName);
+            await this.systemUserService.updateUserName(userId, newName);
             return res.status(200).json({ message: "User name updated successfully" });
         } catch (error) {
           const errorMessage = (error as Error).message;
@@ -56,19 +55,17 @@ export class SystemUserController {
         }
     };
 
-    // Delete a user
     public deleteUser = async (req: Request, res: Response): Promise<Response> => {
         try {
-            const userId = parseInt(req.params.userId);
-            await this.systemUserService.userRepository.deleteSystemUser(userId);
-            return res.status(204).json(); // No Content
+            const userID = parseInt(req.params.userId);
+            await this.systemUserService.deleteSystemUser(userID);
+            return res.status(204).json();
         } catch (error) {
           const errorMessage = (error as Error).message;
           return res.status(500).json({ message: errorMessage});
         }
     };
 
-    // User login
     public loginUser = async (req: Request, res: Response): Promise<Response> => {
         try {
             const { email, password } = req.body;
@@ -78,10 +75,33 @@ export class SystemUserController {
             const loginSuccessful = await this.systemUserService.loginUser(email, password);
             return res.status(200).json({ message: "Login successful", isAuthenticated: loginSuccessful });
         } catch (error) {
-          const errorMessage = (error as Error).message;
+            const errorMessage = (error as Error).message
           return res.status(401).json({ message: errorMessage});
         }
     };
+
+
+    public getAllUsers = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            let page = parseInt(req.query.page as string);
+            let limit = parseInt(req.query.limit as string);
+    
+            // Ensure the parsed numbers are positive integers; otherwise, default them
+            page = isNaN(page) || page < 1 ? 1 : page;
+            limit = isNaN(limit) || limit < 1 ? 10 : limit;
+    
+            const users = await this.systemUserService.retrieveAllUsers(page, limit);
+            return res.status(200).json({
+                data: users,
+                page,
+                limit
+            });
+        } catch (error) {
+            const errorMessage = (error as Error).message;
+            return res.status(500).json({ message: errorMessage });
+        }
+    };
+
 }
 
 // Export the controller as a singleton

@@ -40,7 +40,7 @@ describe('PlanCourses Entity', () => {
     const course = new Course('Calculus', 3, 'Mathematics', 'Core');
     const advisor = new Advisor('Jane Doe', 'jane@example.com', 'pass', 'Fowler');
     const student = new Student('John Doe', 'john@example.com', 'pass', 0, advisor, degreeRequirement);
-    const academicPlan = new AcademicPlan(10, false, student, degreeRequirement);
+    const academicPlan = new AcademicPlan(student, degreeRequirement, 10, false);
     const planCourses = new PlanCourses(academicPlan, course);
 
     expect(planCourses.academicPlan).toBe(academicPlan);

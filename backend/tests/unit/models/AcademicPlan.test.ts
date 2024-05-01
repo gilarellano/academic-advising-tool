@@ -41,7 +41,7 @@ describe('AcademicPlan Entity', () => {
   it('should correctly assign all properties via the constructor', () => {
     const student = new Student('John Doe', 'john.doe@example.com', 'password');
     const degreeRequirement = new DegreeRequirement('Computer Science Major', '2021', 120);
-    const academicPlan = new AcademicPlan(0, false, student, degreeRequirement);
+    const academicPlan = new AcademicPlan(student, degreeRequirement, 0, false);
 
     expect(academicPlan.totalCredits).toBe(0);
     expect(academicPlan.isApproved).toBe(false);

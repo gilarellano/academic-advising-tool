@@ -1,3 +1,4 @@
+// SystemUserService.test.ts
 import { DataSource } from 'typeorm';
 import { SystemUser } from '../../../src/models';  
 import { SystemUserService } from '../../../src/services/SystemUserService';
@@ -114,6 +115,39 @@ describe('SystemUserService', () => {
         expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
       });
     });
+
+    describe('Finds User', () =>{
+      it('returns a user when found by ID', async () => {
+        mockUserRepository.findUserById.mockResolvedValue(mockUser);
+        const user = await userService.findUserByID(1);
+        expect(mockUserRepository.findUserById).toHaveBeenCalledWith(1);
+        expect(user).toEqual(mockUser);
+      });
+
+      it('returns null when no user is found', async () => {
+        mockUserRepository.findUserById.mockResolvedValue(null);
+        const user = await userService.findUserByID(999);
+        expect(mockUserRepository.findUserById).toHaveBeenCalledWith(999);
+        expect(user).toEqual(null);
+      });
+    });
+
+    describe('deleteSystemUser', () => {
+      it('successfully deletes a user and commits the transaction', async () => {
+        mockUserRepository.deleteSystemUser.mockResolvedValue();
+        await userService.deleteSystemUser(1);
+        expect(mockUserRepository.deleteSystemUser).toHaveBeenCalledWith(1, expect.anything());
+        expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+      });
+
+      it('handles error by rolling back the transaction when user to delete is not found', async () => {
+        const error = new Error('User not found');
+        mockUserRepository.deleteSystemUser.mockRejectedValue(error);
+        await expect(userService.deleteSystemUser(999)).rejects.toThrow('User not found');
+        expect(mockUserRepository.deleteSystemUser).toHaveBeenCalledWith(999, expect.anything());
+        expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
+      });
+    });
   });
 
   describe('User Authentication', () => {
@@ -143,4 +177,28 @@ describe('SystemUserService', () => {
       expect(loginSuccess).toBe(true);
     });
   });
+
+  describe('Retrieve All Users', () => {
+    const mockUsers: SystemUser[] = [
+      { userID: 1, name: 'John Doe', email: 'john@example.com', role: 'user', password: 'hashedpassword' },
+      { userID: 2, name: 'Jane Doe', email: 'jane@example.com', role: 'admin', password: 'hashedpassword' }
+    ];
+
+    it('successfully retrieves all users with pagination', async () => {
+      mockUserRepository.findAllUsers.mockResolvedValue(mockUsers);
+      const users = await userService.retrieveAllUsers(1, 2);
+      expect(mockUserRepository.findAllUsers).toHaveBeenCalledWith(1, 2);
+      expect(users).toEqual(mockUsers);
+      expect(users.length).toBe(2);
+    });
+
+    it('returns an empty array if no users are found', async () => {
+      mockUserRepository.findAllUsers.mockResolvedValue([]);
+      const users = await userService.retrieveAllUsers(2, 2);
+      expect(mockUserRepository.findAllUsers).toHaveBeenCalledWith(2, 2);
+      expect(users).toEqual([]);
+      expect(users.length).toBe(0);
+    });
+  });
+
 });

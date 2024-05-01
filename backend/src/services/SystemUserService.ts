@@ -80,4 +80,28 @@ export class SystemUserService {
             await queryRunner.release();
         }
     }
+
+    // New method to retrieve all users with pagination
+    async retrieveAllUsers(page: number, limit: number): Promise<SystemUser[]> {
+        return await this.userRepository.findAllUsers(page, limit);
+    }
+
+    async findUserByID(userID: number): Promise<SystemUser | null> {
+        return this.userRepository.findUserById(userID);
+    }
+
+    async deleteSystemUser(userID: number): Promise<void> {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try{
+            await this.userRepository.deleteSystemUser(userID, queryRunner);
+            await queryRunner.commitTransaction();
+        } catch (error){
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            await queryRunner.release();
+        }
+    }
 }
