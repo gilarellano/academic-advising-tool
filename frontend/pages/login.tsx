@@ -1,4 +1,7 @@
+import React from "react"
 import Link from "next/link"
+import Layout from '../app/layout';  // Adjust the import path according to your structure
+import '../styles/globals.css';      // Import global styles if not already imported in Layout
 
 import { Button } from "@/components/ui/button"
 import {
@@ -44,7 +47,7 @@ export function LoginForm() {
         </div>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link href="#" className="underline">
+          <Link href="/signup" className="underline">
             Sign up
           </Link>
         </div>
