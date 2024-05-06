@@ -1,8 +1,8 @@
 //render-table.tsx
 import React, { useEffect, useState } from "react"
 import '../styles/globals.css';   
-import { SystemUsers, columns } from "./columns"
-import { DataTable } from "./data-table"
+import { SystemUsers, columns } from "./data-table"
+import DataTable from "./page";
 
 async function getData(): Promise<SystemUsers[]> {
     return [

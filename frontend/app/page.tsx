@@ -1,15 +1,15 @@
 import Link from "next/link"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/card"
+import { Input } from "@/components/input"
+import { Label } from "@/components/label"
 
 export function LoginForm() {
   return (
@@ -28,7 +28,7 @@ export function LoginForm() {
             <Input
               id="email"
               type="email"
-              placeholder="m@example.com"
+              placeholder="admin@chapman.edu"
               required
             />
           </div>
@@ -38,13 +38,15 @@ export function LoginForm() {
             </div>
             <Input id="password" type="password" required />
           </div>
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
+           <Link href="dashboard/">
+              <Button type="submit" className="w-full">
+                Login
+              </Button>
+            </Link>
         </div>
         <div className="mt-4 text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link href="#" className="underline">
+          <Link href="signup/" className="underline">
             Sign up
           </Link>
         </div>

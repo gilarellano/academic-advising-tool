@@ -1,18 +1,18 @@
 import React from "react"
 import Link from "next/link"
-import '../styles/globals.css';      // Import global styles if not already imported in Layout
+//import '../styles/globals.css';      // Import global styles if not already imported in Layout
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select";
+} from "@/components/card"
+import { Input } from "@/components/input"
+import { Label } from "@/components/label"
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/select";
 
 export function SignUpForm() {
   return (
@@ -68,7 +68,7 @@ export function SignUpForm() {
         </div>
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <Link href="/login" className="underline">
+          <Link href="../" className="underline">
             Sign in
           </Link>
         </div>
