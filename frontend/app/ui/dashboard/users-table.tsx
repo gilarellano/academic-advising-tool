@@ -94,11 +94,11 @@ function UserRow({ user }: { user: SystemUser }) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => console.log(`Edit ${user.userID}`)}>
-              <Link href={`/dashboard/${user.userID}/edit`} passHref>
-                Edit User
-              </Link>
-            </DropdownMenuItem>
+            <Link href={`/${user.userID}/edit`} passHref>
+              <DropdownMenuItem onClick={() => console.log(`Edit ${user.userID}`)}>
+                  Edit User
+              </DropdownMenuItem>
+           </Link>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => deleteUserWithId()}>
               Delete User

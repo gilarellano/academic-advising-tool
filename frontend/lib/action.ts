@@ -52,8 +52,8 @@ export async function createUser(userData: z.infer<typeof UserSchema>) {
     console.error("Error:", error);
     throw new Error("Failed to create user");
   }
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
+  revalidatePath("/");
+  redirect("/");
 }
 
 // Function to update a user
@@ -92,8 +92,8 @@ export async function updateUser(
     throw new Error("Failed to update user");
   }
   // If successful, revalidate and redirect to the dashboard
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
+  revalidatePath("/");
+  redirect("/");
 }
 
 // Function to delete a user by ID
@@ -103,5 +103,5 @@ export async function deleteUser(userId: number) {
   });
   //if (!response.ok) throw new Error('Failed to delete user');
   console.log(`Deleted User: ${userId}`);
-  revalidatePath("/dashboard");
+  revalidatePath("/");
 }

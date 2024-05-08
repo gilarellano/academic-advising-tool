@@ -1,62 +1,47 @@
-import Link from "next/link"
+// /dashboard page.tsx
+import { UsersTable } from './ui/dashboard/users-table';
+import { CreateUser } from './ui/dashboard/button'
+import { Search } from './ui/dashboard/search';
+import { fetchUsers } from '@/lib/data';
 
-import { Button } from "@/components/button"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/card"
-import { Input } from "@/components/input"
-import { Label } from "@/components/label"
-import { fetchUsers } from "@/lib/data"
-import { SystemUser } from "@/lib/definitions"
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Slash } from "lucide-react"
 
-export function LoginForm() {
+
+export default async function IndexPage({
+  searchParams
+}: {
+  searchParams: { q: string; offset: string };
+}) {
+  const search = searchParams.q ?? '';
+  const offset = parseInt(searchParams.offset, 10) || 0;
+  const { users, offset: newOffset } = await fetchUsers(1, 20);
+  
   return (
-    <div className="flex items-center justify-center min-h-screen">
-    <Card className="mx-auto max-w-sm">
-      <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
-        <CardDescription>
-          Enter your email below to login to your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="admin@chapman.edu"
-              autoComplete="on"
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-            </div>
-            <Input id="password" type="password" required />
-          </div>
-           <Link href="dashboard/">
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-            </Link>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href="signup/" className="underline">
-            Sign up
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
-    </div>
-  )
+    <main className="flex flex-1 flex-col p-4 md:p-6">
+      <div className="flex items-center mb-8">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/dashboard">
+                <h1 className="font-semibold text-lg md:text-2xl">Dashboard</h1>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        {/* <Search value={searchParams.q} /> */}
+        <CreateUser />
+      </div>
+        <UsersTable users={users} offset={null}/>
+    </main>
+  );
 }
-
-export default LoginForm;
