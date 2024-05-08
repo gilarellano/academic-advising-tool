@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Frontend for Academic Advising Tool
 
-## Getting Started
+## Description
 
-First, run the development server:
+This frontend component of the Academic Advising Tool provides a user interface for managing academic advising tasks. It is developed using React, Next.js, and Shadcn for UI components. The application allows for user management including fetching, creating, editing, and deleting users via a responsive interface.
 
+## System Requirements
+
+- Node.js
+- A modern web browser
+
+## Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone [repository-url]
+   cd [repository-directory]/frontend
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+## Running the Application
+
+Before starting the frontend, make sure the backend server is running:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Navigate to the backend directory and run:
+cd ../backend
+npm run start:dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Once the backend is running, start the frontend server:
+```bash
+# Navigate back to the frontend directory
+cd ../frontend
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This command starts the development server on `http://localhost:3000`, where you can interact with the application.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Building the Application
 
-## Learn More
+To build the application for production:
+```bash
+npm run build
+```
+This will compile your application and get it ready for deployment.
 
-To learn more about Next.js, take a look at the following resources:
+## Application Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **app/**: Contains the main pages and components of the application, organized by functionality (e.g., create, edit, settings).
+- **components/**: Reusable UI components used across different parts of the application.
+- **lib/**: Helper functions and libraries.
+- **public/**: Static assets like images and icons.
+- **styles/**: CSS and Tailwind configuration files for styling the application.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Features
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- **User Management**: Create, fetch, edit, and delete user information through interactive forms and tables.
+- **Responsive UI**: Built using Shadcn UI components to ensure the interface is responsive and intuitive.
+- **Real-time Data**: Interacts with the backend to fetch and reflect updates in real-time.

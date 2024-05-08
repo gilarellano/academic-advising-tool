@@ -67,7 +67,7 @@ return (
                 href="/"
               >
                 <Logo />
-                <span className="">Gilberto' Application</span>
+                <span className="">Gilberto&apos;s Application</span>
               </Link>
               {/* <User /> */}
             </header>

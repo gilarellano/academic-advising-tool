@@ -72,7 +72,16 @@ To test only the database connections:
 npm run test:datasource
 ```
 
-## SonarQube Analysis
+## Code Coverage Report
+
+### Jest
+To access the generated jest report
+```bash
+cd /coverage/lcov-report/
+open index.html
+```
+
+### SonarQube
 
 To set up and run a SonarQube report, ensure you have SonarQube server running. Configure `sonar-project.js` with your project specifics. A typical configuration might look like this:
 ```javascript
