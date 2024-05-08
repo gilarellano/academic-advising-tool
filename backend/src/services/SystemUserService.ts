@@ -90,6 +90,12 @@ export class SystemUserService {
         return this.userRepository.findUserById(userID);
     }
 
+    // Method to check if an email already exists
+    async emailExists(email: string): Promise<boolean> {
+        const user = await this.userRepository.findUserByEmail(email);
+        return user !== null;
+    }
+
     async deleteSystemUser(userID: number): Promise<void> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();

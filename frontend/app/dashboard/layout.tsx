@@ -1,4 +1,5 @@
-import './globals.css';
+// dashboard/ layout.tsx
+import '../../styles/dashboard.css';
 
 import Link from 'next/link';
 //import { Analytics } from '@vercel/analytics/react';
@@ -18,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full bg-gray-50">
-      <body>
+    <div lang="en" className="h-full bg-gray-50">
+      <div>
         <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
           <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
             <div className="flex h-full max-h-screen flex-col gap-2">
@@ -60,7 +61,7 @@ export default function RootLayout({
             {children}
           </div>
         </div>
-      </body>
-    </html>
+      </div>
+    </div>
   );
 }

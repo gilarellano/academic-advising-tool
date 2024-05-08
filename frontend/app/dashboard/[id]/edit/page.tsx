@@ -1,4 +1,4 @@
-import { UserForm } from "@/app/ui/dashboard/create/create-form";
+import { UserForm } from "@/app/ui/dashboard/edit/edit-form";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,9 +7,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Slash } from "lucide-react"
+import { fetchUserById } from "@/lib/data";
 
-export default async function Page() {
+export default async function Page({ params }: { params : { id: number}}) {
+  const user = await fetchUserById(params.id);
+  //console.log(user);
+
   return (
     <main className="flex flex-1 flex-col p-4 md:p-6">
     <div className="flex items-center mb-8">
@@ -25,13 +28,13 @@ export default async function Page() {
             </BreadcrumbSeparator>
             <BreadcrumbItem>
               <BreadcrumbLink href="/dashboard/create">
-                <h1 className="font-semibold text-lg md:text-2xl">Create</h1>
+                <h1 className="font-semibold text-lg md:text-2xl">Edit</h1>
               </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
     </div>
-      <UserForm />
+      <UserForm user={user}/>
     </main>
   );
 }

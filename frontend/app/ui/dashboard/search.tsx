@@ -30,7 +30,7 @@ export function Search(props: { value?: string }) {
   }, [router, value]);
 
   return (
-    <div className="relative">
+    <div className="relative flex flex-1 flex-shrink-0">
       <SearchIcon className="absolute left-2.5 top-3 h-4 w-4 text-gray-500" />
       <Input
         ref={inputRef}

@@ -80,7 +80,6 @@ export class SystemUserController {
         }
     };
 
-
     public getAllUsers = async (req: Request, res: Response): Promise<Response> => {
         try {
             let page = parseInt(req.query.page as string);
@@ -99,6 +98,21 @@ export class SystemUserController {
         } catch (error) {
             const errorMessage = (error as Error).message;
             return res.status(500).json({ message: errorMessage });
+        }
+    };
+
+    // Method to check email existence
+    public checkEmailExists = async (req: Request, res: Response): Promise<Response> => {
+        const email = req.query.email as string;
+        if (!email) {
+            return res.status(400).json({ message: "Email parameter is required" });
+        }
+        try {
+            const exists = await this.systemUserService.emailExists(email);
+            return res.json({ exists });
+        } catch (error) {
+            const errorMessage = (error as Error).message
+            return res.status(500).json({ message: "Error checking email existence", errorMessage});
         }
     };
 

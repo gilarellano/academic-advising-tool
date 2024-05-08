@@ -10,6 +10,8 @@ import {
 } from "@/components/card"
 import { Input } from "@/components/input"
 import { Label } from "@/components/label"
+import { fetchUsers } from "@/lib/data"
+import { SystemUser } from "@/lib/definitions"
 
 export function LoginForm() {
   return (
@@ -29,6 +31,7 @@ export function LoginForm() {
               id="email"
               type="email"
               placeholder="admin@chapman.edu"
+              autoComplete="on"
               required
             />
           </div>
