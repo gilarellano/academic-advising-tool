@@ -19,7 +19,7 @@ export default async function Page({ params }: { params : { id: number}}) {
       <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">
+              <BreadcrumbLink href="/">
                 <h1 className="font-semibold text-lg md:text-2xl">Dashboard</h1>
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -27,7 +27,7 @@ export default async function Page({ params }: { params : { id: number}}) {
                 <h1 className="font-semibold text-lg md:text-2xl">&gt;</h1>
             </BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard/create">
+              <BreadcrumbLink href="/edit">
                 <h1 className="font-semibold text-lg md:text-2xl">Edit</h1>
               </BreadcrumbLink>
             </BreadcrumbItem>

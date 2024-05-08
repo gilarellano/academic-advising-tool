@@ -30,7 +30,7 @@ export default async function IndexPage({
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">
+              <BreadcrumbLink href="/">
                 <h1 className="font-semibold text-lg md:text-2xl">Dashboard</h1>
               </BreadcrumbLink>
             </BreadcrumbItem>

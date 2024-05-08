@@ -16,7 +16,7 @@ export default async function Page() {
       <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">
+              <BreadcrumbLink href="/">
                 <h1 className="font-semibold text-lg md:text-2xl">Dashboard</h1>
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -24,7 +24,7 @@ export default async function Page() {
                 <h1 className="font-semibold text-lg md:text-2xl">&gt;</h1>
             </BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard/create">
+              <BreadcrumbLink href="/create">
                 <h1 className="font-semibold text-lg md:text-2xl">Create</h1>
               </BreadcrumbLink>
             </BreadcrumbItem>

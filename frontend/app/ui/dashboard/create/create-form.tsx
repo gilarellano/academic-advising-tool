@@ -27,7 +27,8 @@ import { createUser } from "@/lib/action";
 import { checkEmail } from "@/lib/action";
 
 const RoleSchema = z.enum(["admin", "student", "advisor"]);
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = "http://54.215.48.100:3001";
+
 
 export const UserSchema = z.object({
   name: z.string().min(1, "Name is required"),
