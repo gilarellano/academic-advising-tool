@@ -5,7 +5,10 @@ import { AppDataSource } from './database/DataSource';
 import SystemUserController from './api/controllers/SystemUserController';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT ?? 3001;
+
+// Disable the 'X-Powered-By' header to prevent the framework from disclosing version information
+app.disable('x-powered-by');
 
 app.use(cors({ origin: 'http://localhost:3000' })); // Frontend URL
 app.use(express.json());
@@ -17,7 +20,6 @@ AppDataSource.initialize().then(() => {
     // User routes
     app.post('/users', SystemUserController.createUser);
     app.get('/users/:userId', SystemUserController.getUserById);
-    //app.put('/users/:userId', SystemUserController.updateUserName);
     app.put('/users/:userId', SystemUserController.updateUser);
     app.delete('/users/:userId', SystemUserController.deleteUser);
     app.post('/users/login', SystemUserController.loginUser);

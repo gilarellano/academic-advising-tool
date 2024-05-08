@@ -1,66 +1,99 @@
-# Academic Advising Tool
+# Backend for Academic Advising Tool
 
 ## Author
 **Name:** Gilberto Arellano
 **Student ID:** 1801074
 
-The Academic Advising Tool is a web-based application designed to facilitate the academic planning process for students, advisors, and faculty. It automates the generation of degree plans, allows for flexible customization, and provides progress tracking to ensure students stay on track with their academic goals.
+**Note: This application is currently under development.** 
 
-## Getting Started
+## Description
 
-### Installation
+This backend serves as the server-side component for the Academic Advising Tool, handling database operations, API services, and user management. It's built with TypeScript, uses TypeORM for ORM, and is tested with Jest.
 
-1. Clone the repository:
-   ```sh
-   git clone https://your-repository-url-here.git
+## System Requirements
+
+- Node.js
+- PostgreSQL
+- A modern web browser
+- SonarQube (for code quality analysis)
+
+## Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone [repository-url]
+   cd [repository-directory]/backend
    ```
-2. Navigate to the project directory:
-   ```sh
-   cd academic-advising-tool
-   ```
-3. Install project dependencies:
-   ```sh
+
+2. **Install dependencies:**
+   ```bash
    npm install
    ```
 
-## Running the Tests
+3. **Set up your PostgreSQL database and remember your credentials.**
 
-The project uses Jest for unit and integration testing, leveraging TypeScript directly. Tests are organized under the `__tests__` directory, with separate subdirectories for unit and integration tests.
+4. **Configure your environment variables:**
+   Create a `.env` file in the root of the `backend` directory and populate it with your database credentials and environment configuration as shown below:
+   ```
+   NODE_ENV=development
+   DB_HOST=localhost
+   DB_PORT=your_database_port
+   DB_USERNAME=your_database_username
+   DB_PASSWORD=your_database_password
+   DB_DATABASE=your_database_name
+   ```
 
-### Running All Tests
+## Running the Application
 
-To run all tests and display a coverage summary, execute the following command:
-```sh
-npm test
+To run the server in development mode, use:
+```bash
+npm run start:dev
 ```
 
-This command directly runs the TypeScript tests without the need to compile them to JavaScript first.
+## Testing
 
-### Running Specific Tests
-
-To run a specific test file, use the Jest command followed by the path to the test file:
-```sh
-npx jest tests/unit/YourTestFile.test.ts
+To run all tests:
+```bash
+npm run test
 ```
 
-## Test Coverage
-
-After running tests, a coverage report is generated in the `coverage/lcov-report` directory. To view the coverage report, open the `index.html` file in your browser:
-```sh
-open coverage/lcov-report/index.html
+To run tests silently:
+```bash
+npm run test:silent
 ```
 
-## Project Structure
+To seed the database with users
+```bash
+npm run seed
+```
 
-- `src/`: Contains the source code with models and services.
-  - `models/`: Classes representing the business logic.
-  - `services/`: Services for handling operations and interactions between models.
-- `__tests__/`: Test suites for the project.
-  - `unit/`: Unit tests for individual components.
-  - `integration/`: Integration tests to test the interactions between components.
-- `coverage/`: Generated directory to provide test coverage report.
-- `node_modules/`: Project dependencies.
-- `jest.config.js`: Configuration file for Jest, set up to handle TypeScript tests directly.
-- `tsconfig.json`: Configuration file for TypeScript.
-- `package.json`: Defines scripts and dependencies of the project.
+To test only the database connections:
+```bash
+npm run test:datasource
+```
 
+## SonarQube Analysis
+
+To set up and run a SonarQube report, ensure you have SonarQube server running. Configure `sonar-project.js` with your project specifics. A typical configuration might look like this:
+```javascript
+const sonarqubeScanner = require('sonarqube-scanner');
+
+sonarqubeScanner({
+  serverUrl: 'http://localhost:9000',
+  options : {
+    'sonar.sources': 'src',
+    'sonar.tests': 'tests',
+    'sonar.inclusions': '**', // Path to your source code
+    'sonar.test.inclusions': 'tests/**/*.ts,tests/**/*.tsx',
+    'sonar.typescript.lcov.reportPaths': 'coverage/lcov.info',
+    'sonar.testExecutionReportPaths': 'coverage/test-report.xml',
+    'sonar.login': 'admin',
+    'sonar.password': 'admin'
+  }
+}, () => {});
+```
+
+Run SonarQube analysis with:
+```bash
+npm run sonar
+```

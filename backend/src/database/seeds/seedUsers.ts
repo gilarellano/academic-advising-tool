@@ -1,8 +1,9 @@
+// seedUsers.ts
 import { AppDataSource } from '../DataSource';
 import { SystemUser } from '../../models/';
 import bcrypt from 'bcrypt';
 
-async function createInitialUsers() {
+export async function createInitialUsers() {
   const userRepository = AppDataSource.getRepository(SystemUser);
   const users = [
     { name: "Alice", email: "alice@example.com", role: "admin", password: await bcrypt.hash("alice_pass123", 10) },
@@ -29,7 +30,7 @@ async function createInitialUsers() {
   }
 }
 
-async function runMigrations() {
+export async function runMigrations() {
   try {
     const migrations = await AppDataSource.runMigrations();
     console.log(`${migrations.length} migration(s) executed.`);

@@ -89,6 +89,7 @@ describe('SystemUserController', () => {
       expect(res.json).toHaveBeenCalledWith({ message: error.message });
     });
   });
+
   describe('getUserById', () => {
     it('should return user if found', async () => {
       const req = { params: { userId: '1' } } as any;
@@ -308,4 +309,117 @@ describe('SystemUserController', () => {
       expect(res.json).toHaveBeenCalledWith({ message: error.message });
     });
   });
+
+  describe('updateUser', () => {
+    it('should update user details successfully', async () => {
+      const req = mockRequest({
+        name: 'Updated Name',
+        email: 'updated@example.com',
+        role: 'admin',
+        password: 'newpassword'
+      }, { userId: '1' });
+      const res = mockResponse();
+  
+      mockService.updateUserName.mockResolvedValue();
+      mockService.updateUserEmail.mockResolvedValue();
+      mockService.updateUserRole.mockResolvedValue();
+      mockService.updateUserPassword.mockResolvedValue();
+  
+      await controller.updateUser(req, res);
+  
+      expect(mockService.updateUserName).toHaveBeenCalledWith(1, 'Updated Name');
+      expect(mockService.updateUserEmail).toHaveBeenCalledWith(1, 'updated@example.com');
+      expect(mockService.updateUserRole).toHaveBeenCalledWith(1, 'admin');
+      expect(mockService.updateUserPassword).toHaveBeenCalledWith(1, 'newpassword');
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'User updated successfully.' });
+    });
+  
+    it('should return 200 if no user details are provided', async () => {
+      const req = mockRequest({}, { userId: '1' }); // No body provided
+      const res = mockResponse();
+  
+      await controller.updateUser(req, res);
+  
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'User updated successfully.'});
+    });
+  
+    it('should handle missing user ID', async () => {
+      const req = mockRequest({
+        name: 'Updated Name'
+      }); // Missing userId
+      const res = mockResponse();
+  
+      await controller.updateUser(req, res);
+  
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'User ID is required.' });
+    });
+  
+    it('should handle exceptions', async () => {
+      const req = mockRequest({
+        name: 'Updated Name'
+      }, { userId: '1' });
+      const res = mockResponse();
+      const error = new Error('Internal Server Error');
+  
+      mockService.updateUserName.mockRejectedValue(error);
+  
+      await controller.updateUser(req, res);
+  
+      expect(mockService.updateUserName).toHaveBeenCalledWith(1, 'Updated Name');
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: error.message });
+    });
+  });
+
+  describe('checkEmailExists', () => {
+    it('should return true when email exists', async () => {
+      const req = mockRequest({}, {}, { email: 'existing@example.com' });
+      const res = mockResponse();
+      mockService.emailExists.mockResolvedValue(true);
+  
+      await controller.checkEmailExists(req, res);
+  
+      expect(mockService.emailExists).toHaveBeenCalledWith('existing@example.com');
+      expect(res.json).toHaveBeenCalledWith({ exists: true });
+    });
+  
+    it('should return false when email does not exist', async () => {
+      const req = mockRequest({}, {}, { email: 'nonexistent@example.com' });
+      const res = mockResponse();
+      mockService.emailExists.mockResolvedValue(false);
+  
+      await controller.checkEmailExists(req, res);
+  
+      expect(mockService.emailExists).toHaveBeenCalledWith('nonexistent@example.com');
+      expect(res.json).toHaveBeenCalledWith({ exists: false });
+    });
+  
+    it('should return 400 if email parameter is not provided', async () => {
+      const req = mockRequest();  // No email query parameter
+      const res = mockResponse();
+  
+      await controller.checkEmailExists(req, res);
+  
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Email parameter is required' });
+    });
+  
+    it('should handle exceptions and return 500 status', async () => {
+      const req = mockRequest({}, {}, { email: 'test@example.com' });
+      const res = mockResponse();
+      const error = new Error('Internal server error');
+  
+      mockService.emailExists.mockRejectedValue(error);
+  
+      await controller.checkEmailExists(req, res);
+  
+      expect(mockService.emailExists).toHaveBeenCalledWith('test@example.com');
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: "Error checking email existence", errorMessage: error.message });
+    });
+  });
+
 });

@@ -40,7 +40,7 @@ export class SystemUserRepository {
         const sanitizedEmail = sanitizeInput(email);
         // This will return `null` if no user is found, which is treated as a non-exceptional case.
         return await manager.findOneBy(SystemUser, { email: sanitizedEmail });
-}
+    }
     
 
     async findUserEmailById(userId: number, queryRunner?: QueryRunner): Promise<string | undefined> {

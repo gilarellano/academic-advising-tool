@@ -176,6 +176,21 @@ describe('SystemUserService', () => {
       const loginSuccess = await userService.loginUser('john@example.com', 'correctpassword');
       expect(loginSuccess).toBe(true);
     });
+
+    it('returns true if the email exists in the database', async () => {
+      mockUserRepository.findUserByEmail.mockResolvedValue(mockUser);
+      const exists = await userService.emailExists('john@example.com');
+      expect(mockUserRepository.findUserByEmail).toHaveBeenCalledWith('john@example.com');
+      expect(exists).toBe(true);
+    });
+  
+    it('returns false if the email does not exist in the database', async () => {
+      mockUserRepository.findUserByEmail.mockResolvedValue(null);
+      const exists = await userService.emailExists('nonexistent@example.com');
+      expect(mockUserRepository.findUserByEmail).toHaveBeenCalledWith('nonexistent@example.com');
+      expect(exists).toBe(false);
+    });
+
   });
 
   describe('Retrieve All Users', () => {
