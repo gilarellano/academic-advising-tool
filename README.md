@@ -5,7 +5,7 @@
 
 ## Overview
 
-This project is an academic advising software tool designed to manage user data and facilitate academic advising processes. The application is divided into two main components: a backend and a frontend.
+The application is accessible via [garellano.dev](https://garellano.dev). I have managed to deploy the database using AWS EC2, although I am still having trouble setting up the process manager to the server running.
 
 ### Backend
 
