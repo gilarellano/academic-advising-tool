@@ -4,7 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = "http://54.215.48.100:3001";
 const UserSchema = z.object({
   id: z.number().optional(),
   name: z.string().min(1, "Name is required"),

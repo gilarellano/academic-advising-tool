@@ -3,7 +3,7 @@ import 'server-only';
 
 import { unstable_noStore as noStore } from "next/cache";
 
-const BASE_URL = 'http://localhost:3001';
+const BASE_URL = 'http://54.215.48.100:3001';
 
 // Function to fetch all users
 export async function fetchUsers(page = 1, limit = 10) {
