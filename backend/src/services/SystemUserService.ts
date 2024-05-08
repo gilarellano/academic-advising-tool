@@ -45,7 +45,6 @@ export class SystemUserService {
     async updateUserName(userId: number, newName: string): Promise<void> {
         await this.userRepository.updateUserName(userId, newName);
     }
-    
 
     async updateUserEmail(userId: number, newEmail: string): Promise<void> {
         const queryRunner = this.dataSource.createQueryRunner();

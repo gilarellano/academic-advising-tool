@@ -17,7 +17,8 @@ AppDataSource.initialize().then(() => {
     // User routes
     app.post('/users', SystemUserController.createUser);
     app.get('/users/:userId', SystemUserController.getUserById);
-    app.put('/users/:userId', SystemUserController.updateUserName);
+    //app.put('/users/:userId', SystemUserController.updateUserName);
+    app.put('/users/:userId', SystemUserController.updateUser);
     app.delete('/users/:userId', SystemUserController.deleteUser);
     app.post('/users/login', SystemUserController.loginUser);
     app.get('/users', SystemUserController.getAllUsers);

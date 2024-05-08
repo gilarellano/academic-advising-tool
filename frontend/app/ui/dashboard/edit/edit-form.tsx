@@ -1,6 +1,7 @@
 // create-form.tsx
 "use client";
 
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,7 +24,7 @@ import {
   SelectItem,
   SelectContent,
 } from "@/components/select";
-import { createUser } from "@/lib/action";
+import { updateUser } from "@/lib/action";
 import { checkEmail } from "@/lib/action";
 import { SystemUser } from "@/lib/definitions";
 
@@ -31,12 +32,13 @@ const RoleSchema = z.enum(["admin", "student", "advisor"]);
 const BASE_URL = "http://localhost:3001";
 
 export const UserSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  id: z.number(),
+  name: z.string(),
   email: z.string().email({ message: "Invalid email format" }),
   role: z.enum(["admin", "student", "advisor"], {
     invalid_type_error: "Please select role type",
   }),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
+  password: z.string()
 });
 
 interface UserFormProps{
@@ -44,32 +46,37 @@ interface UserFormProps{
 }
 
 export function UserForm({ user }: UserFormProps) {
+  const [originalEmail, setOriginalEmail] = useState(user.email);
 
   // Define your form.
   const form = useForm<z.infer<typeof UserSchema>>({
     resolver: zodResolver(UserSchema),
     defaultValues: {
-      name: user?.name || "",
-      email: "",
-      role: "student",
-      password: "",
+      id: user.userID,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      password: "default",
     },
   });
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof UserSchema>) {
+    console.log("Values: ", values);
+    //form.clearErrors();
     try {
-      // Want to check if the email exists before attempting to create
-      const emailInUse = await checkEmail(values.email);
-      if (emailInUse) {
-        form.setError("email", {
-          type: "manual",
-          message: "Email already in use.",
-        });
-        return;
+      if (values.email !== originalEmail) {
+        const emailInUse = await checkEmail(values.email);
+        if (emailInUse) {
+          form.setError("email", {
+            type: "manual",
+            message: "Email already in use.",
+          });
+          return;
+        }
       }
-      const user = createUser(values);
-      console.log("User created:", user);
+
+      const user = updateUser(values.id, values);
     } catch (error) {
       console.error("Failed to create user:", error);
     }
@@ -88,10 +95,7 @@ export function UserForm({ user }: UserFormProps) {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input 
-                  defaultValue={user.name}
-                  placeholder="John Doe"
-                  />
+                <Input placeholder={user.name} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,10 +108,7 @@ export function UserForm({ user }: UserFormProps) {
             <FormItem>
               <FormLabel>E-Mail</FormLabel>
               <FormControl>
-                <Input 
-                  defaultValue={user.email}
-                  placeholder="student@chapman.edu" 
-                  />
+                <Input placeholder={user.email} {...field} />
               </FormControl>
               {/* Show error message if email field has an error */}
               {fieldState.error && (
@@ -122,10 +123,10 @@ export function UserForm({ user }: UserFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Role</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue defaultValue={user.role} />
+                    <SelectValue placeholder={user.role}/>
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -146,14 +147,14 @@ export function UserForm({ user }: UserFormProps) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" />
+                <Input type="password" {...field}/>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button className="mt-4" type="submit">
-          Submit
+          Save Changes
         </Button>
       </form>
     </Form>

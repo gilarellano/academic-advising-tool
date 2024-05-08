@@ -39,10 +39,10 @@ export default function RootLayout({
                     <UsersIcon className="h-4 w-4" />
                     Users
                   </NavItem>
-                  <NavItem href="/dashboard/settings">
+                  {/* <NavItem href="/dashboard/settings">
                     <SettingsIcon className="h-4 w-4" />
                     Settings
-                  </NavItem>
+                  </NavItem> */}
                 </nav>
               </div>
             </div>

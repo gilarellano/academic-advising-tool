@@ -38,7 +38,7 @@ export default async function IndexPage({
         </Breadcrumb>
       </div>
       <div className="mb-4 flex items-center justify-between gap-2">
-        <Search value={searchParams.q} />
+        {/* <Search value={searchParams.q} /> */}
         <CreateUser />
       </div>
         <UsersTable users={users} offset={null}/>
